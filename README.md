@@ -10,7 +10,7 @@ Quản lý website, domain, và email doanh nghiệp bằng ngôn ngữ bình th
 
 Hosting panel truyền thống được làm cho kỹ thuật. **VipaVault** được làm cho founder, CEO, và team vận hành cần sự rõ ràng, kiểm soát và chi phí minh bạch.
 
-**Vipa = VIP + Admin**
+**Vipa = Vibe + Admin + Vipafood**
 
 ## 🚀 Tính năng chính
 
