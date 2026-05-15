@@ -18,7 +18,7 @@ Tauri 2.x desktop app quản lý hosting/email/domain credential.
 ## 2. Quy trình bắt buộc mỗi task
 
 ```
-1. Đọc docs/hosting-vault-spec.md — xác định module liên quan
+1. Đọc docs/hosting_vault_spec.md — xác định module liên quan
 2. Đọc .context/GLOBAL.md — xem module index
 3. Load context module: context-gen load <module> . --include-manual
 4. Nếu [manual] còn template placeholder → DỪNG, hỏi lại human
@@ -178,7 +178,7 @@ Cargo test PHẢI pass trước khi commit. Frontend test chạy qua `npm test`.
 ```
 hosting-vault/
   docs/
-    hosting-vault-spec.md     ← Spec chính
+    hosting_vault_spec.md     ← Spec chính
   src-tauri/
     src/
       vault/                  ← SQLCipher engine, key lifecycle
