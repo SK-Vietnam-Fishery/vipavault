@@ -1,0 +1,86 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+dist
+dist-ssr
+build
+out
+
+# Vite
+.vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# React
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Testing
+coverage
+.nyc_output
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Tauri
+src-tauri/target
+src-tauri/WixTools
+src-tauri/gen
+src-tauri/.vs
+src-tauri/Cargo.lock
+**/*.rs.bk
+
+# Tauri debug bundles
+*.app.tar.gz
+*.AppImage
+*.AppImage.tar.gz
+*.dmg
+*.deb
+*.rpm
+*.msi
+*.msi.zip
+*.nsis.zip
+*.exe
+
+# Rust
+**/target
+**/*.pdb
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Turbo / pnpm
+.turbo
+.pnpm-store
+
+# OS
+Thumbs.db
+
+# Secret
+.env
+/docs
