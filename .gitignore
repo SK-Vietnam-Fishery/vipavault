@@ -84,3 +84,4 @@ Thumbs.db
 # Secret
 .env
 /docs
+LOCAL_CONTEXT_GEN.md

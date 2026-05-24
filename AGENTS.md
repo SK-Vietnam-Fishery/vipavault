@@ -18,6 +18,7 @@ Tauri 2.x desktop app quản lý hosting/email/domain credential.
 ## 2. Context Map — Hiểu trước khi làm
 
 Project này dùng **context-gen** để quản lý context cho agent. Đây không phải tool tùy chọn — đây là cách duy nhất để mày biết codebase đang ở trạng thái nào và constraints nào đang áp dụng.
+Máy local có thể có hướng dẫn riêng trong `LOCAL_CONTEXT_GEN.md` (gitignored).
 
 ### Tại sao có tool này
 
@@ -89,10 +90,10 @@ context-gen build . --quiet
 
 # Kiểm tra output
 ls .context/
-# Phải thấy: GLOBAL.md, TENSIONS.md, và các file per-module
+# Phải thấy: GLOBAL.md, MILESTONES.md, TENSIONS_OPEN.md, TENSIONS_ACTIVE.md, TENSIONS_HISTORY.md, và các file per-module
 
-# Khởi tạo TENSIONS.md nếu chưa có
-touch .context/TENSIONS.md
+# Khởi tạo tension V3 files nếu chưa có
+touch .context/TENSIONS_OPEN.md .context/TENSIONS_ACTIVE.md .context/TENSIONS_HISTORY.md .context/MILESTONES.md
 ```
 
 **Sau bước này**, mở từng file `.context/<module>.md` và điền `[manual]` section cho:
@@ -119,7 +120,7 @@ context-gen load <module> . --include-manual
   ▼
 Detect tension với constraint trong spec / [manual]?
   │
-  ├── Có → ghi vào .context/TENSIONS.md (xem Section 8)
+  ├── Có → ghi vào .context/TENSIONS_OPEN.md (xem Section 9)
   │         LOW  → tiếp tục conservative
   │         HIGH → tạo HANDSHAKE_<timestamp>.md, DỪNG, chờ .resolved
   │
@@ -221,7 +222,12 @@ Nếu code conflict với spec → sửa code, không sửa spec. Nếu spec c�
 
 ## 9. Tension Register & Decision Log
 
-`TENSIONS.md` có **2 loại entry**. Đọc cả hai trước khi làm task — đặc biệt là Decision Log, vì nó chứa những thứ đã bị reject mà mày không được propose lại.
+Tension V3 dùng 3 file:
+- `.context/TENSIONS_OPEN.md` — chỉ `Status: OPEN`, luôn đọc full trước task.
+- `.context/TENSIONS_ACTIVE.md` — chỉ `Status: RESOLVED_ACTIVE` của milestone hiện tại, đọc theo tag filter.
+- `.context/TENSIONS_HISTORY.md` — chỉ `Status: ARCHIVED`, không đọc mặc định trừ khi human yêu cầu audit.
+
+`.context/MILESTONES.md` chứa `Current:` để xác định milestone hiện tại.
 
 ### Loại 1 — Tension chưa resolve (open)
 
@@ -229,11 +235,14 @@ Khi detect conflict giữa task và constraint trong spec/[manual]:
 
 ```markdown
 ## [timestamp] | [module] | OPEN
+Status:     OPEN
 Tension:    mô tả conflict
 Context:    đang làm task gì
 Proposal:   muốn làm gì
 Constraint: rule nào conflict (trích dẫn từ spec hoặc [manual])
 Severity:   low | high
+Tags:       tag1, tag2
+Milestone:  current milestone từ .context/MILESTONES.md
 Decision:   [human fill in]
 ```
 
@@ -246,21 +255,25 @@ Decision:   [human fill in]
 - Task thêm provider mới không define auth_scheme → HIGH
 - Task log credential để debug → HIGH (security)
 
-### Loại 2 — Decision Log (resolved, vĩnh viễn)
+### Loại 2 — Decision Log active
 
-Ghi lại những quyết định đã được cân nhắc và chốt. Mục đích: agent mới đọc vào biết đây là **quyết định có chủ ý**, không phải lỗ hổng cần fix.
+Ghi lại những quyết định đã được cân nhắc và chốt trong `.context/TENSIONS_ACTIVE.md`. Mục đích: agent mới đọc vào biết đây là **quyết định có chủ ý**, không phải lỗ hổng cần fix.
 
 ```markdown
-## [timestamp] | [module] | RESOLVED
+## [timestamp] | [module]
+Status:      RESOLVED_ACTIVE
 Tension:     tên vấn đề đã được cân nhắc
 Options:     A → ưu/nhược | B → ưu/nhược
 Decision:    lựa chọn cuối cùng
 Rationale:   lý do chọn, bằng chứng hoặc risk cụ thể
 Constraint:  KHÔNG reopen trừ khi [điều kiện cụ thể]
-Phase:       V1 | Phase2 | all
+Severity:    low | high
+Tags:        tag1, tag2
+Milestone:   V1
+Phase:       V1 | Phase 2 | all
 ```
 
-**Rule:** Entry RESOLVED không bao giờ bị xóa. Chỉ thêm entry mới nếu context thay đổi và cần reopen.
+**Rule:** Entry RESOLVED_ACTIVE không bao giờ bị xóa. Khi qua milestone mới, chỉ move sang `.context/TENSIONS_HISTORY.md` và đổi `Status: ARCHIVED` nếu human approve.
 
 **Ví dụ thực tế của project này:**
 
@@ -302,7 +315,7 @@ Khi viết [manual] section, tag phase để agent sau biết constraint nào s�
 ```markdown
 [manual] Invariants — Phase: V1
 Constraint X chỉ áp dụng Phase 1.
-Phase 2 (OAuth): constraint này sẽ thay đổi — xem TENSIONS.md entry oauth_credentials.
+Phase 2 (OAuth): constraint này sẽ thay đổi — xem `.context/TENSIONS_ACTIVE.md` entry oauth_credentials.
 ```
 
 Khi constraint cũ hết hiệu lực, KHÔNG xóa — mark deprecated:
@@ -381,5 +394,8 @@ vipavault/
     hooks/
   .context/
     GLOBAL.md
-    TENSIONS.md
+    MILESTONES.md
+    TENSIONS_OPEN.md
+    TENSIONS_ACTIVE.md
+    TENSIONS_HISTORY.md
 ```
