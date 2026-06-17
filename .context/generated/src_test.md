@@ -1,37 +1,14 @@
-<!-- AUTO_START | hash: e7bc6a3b | built: 2026-05-24T11:47 -->
-# Context: `src-tauri/src`
+<!-- AUTO_START | hash: 5c23312e | built: 2026-06-17T15:06 -->
+# Context: `src/test`
 
 > **[auto-generated — không sửa tay phần này]**  
-> Language: `rust`  
-> Source files: 2
-
-## [auto] Public Functions
-
-### `foundation_status` (line 15)
-```rust
-pub fn foundation_status() -> AppStatus
-```
-
-### `run` (line 22)
-```rust
-pub fn run()
-```
-
-## [auto] Structs
-
-### `AppStatus`
-_derives: Debug, Clone, PartialEq, Eq, Serialize_
-
-| Field | Type |
-|-------|------|
-| `app_name` | `&'static str` |
-| `milestone` | `&'static str` |
+> Language: `typescript`  
+> Source files: 1
 
 ## [auto] Key Imports
 
 ```
-use serde::Serialize;
-use super::*;
+import "@testing-library/jest-dom/vitest";
 ```
 
 <!-- AUTO_END -->

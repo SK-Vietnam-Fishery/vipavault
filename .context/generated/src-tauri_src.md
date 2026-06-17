@@ -1,9 +1,38 @@
-<!-- AUTO_START | hash: 5d1a97b8 | built: 2026-05-24T11:47 -->
-# Context: `src-tauri/src/sync`
+<!-- AUTO_START | hash: e7bc6a3b | built: 2026-06-17T15:06 -->
+# Context: `src-tauri/src`
 
 > **[auto-generated — không sửa tay phần này]**  
 > Language: `rust`  
-> Source files: 1
+> Source files: 2
+
+## [auto] Public Functions
+
+### `foundation_status` (line 15)
+```rust
+pub fn foundation_status() -> AppStatus
+```
+
+### `run` (line 22)
+```rust
+pub fn run()
+```
+
+## [auto] Structs
+
+### `AppStatus`
+_derives: Debug, Clone, PartialEq, Eq, Serialize_
+
+| Field | Type |
+|-------|------|
+| `app_name` | `&'static str` |
+| `milestone` | `&'static str` |
+
+## [auto] Key Imports
+
+```
+use serde::Serialize;
+use super::*;
+```
 
 <!-- AUTO_END -->
 

@@ -17,65 +17,69 @@ Tauri 2.x desktop app quản lý hosting/email/domain credential.
 
 ## 2. Context Map — Hiểu trước khi làm
 
-Project này dùng **context-gen** để quản lý context cho agent. Đây không phải tool tùy chọn — đây là cách duy nhất để mày biết codebase đang ở trạng thái nào và constraints nào đang áp dụng.
+Layout `.context/` theo mô hình phân tầng (tham khảo `../skvn-marine`). Chi tiết folder: **`.context/README.md`**.
+
+Project dùng **context-gen** cho AST facts + **`.context/modules/`** cho decisions/invariants human-readable.
 Máy local có thể có hướng dẫn riêng trong `LOCAL_CONTEXT_GEN.md` (gitignored).
 
-### Tại sao có tool này
-
-Source code chỉ nói **cái gì đang tồn tại** (factual). Nó không nói:
-- Tại sao code làm thế này
-- Cái gì không được làm
-- Cái gì chưa implement nhưng đã có quyết định
-
-`context-gen` sinh file `.context/<module>.md` cho mỗi module bằng cách parse AST. Mỗi file có 2 vùng tách biệt:
+### Đọc trước — Bắt buộc mỗi task
 
 ```
-<!-- AUTO_START -->
-[auto] — do tool sinh từ AST: public functions, structs, Tauri commands
-         Tool sẽ overwrite vùng này mỗi lần build. KHÔNG sửa tay.
-<!-- AUTO_END -->
-
-<!-- MANUAL_START -->
-[manual] — do human viết: design decisions, invariants, constraints, behavior chưa implement
-           Tool KHÔNG BAO GIỜ động vào vùng này.
-<!-- MANUAL_END -->
+1. Đọc .context/GLOBAL.md          → stack, module index
+2. Đọc .context/PROJECT.md         → quyết định project-wide
+3. Đọc .context/MILESTONES.md      → milestone / execution boundary
+4. Đọc .context/TENSIONS_OPEN.md   → toàn bộ OPEN tensions
+5. Đọc .context/TENSIONS_ACTIVE.md → RESOLVED_ACTIVE (tag filter)
+6. Đọc .context/modules/<module>.md → module sắp sửa
 ```
 
-### Rule đọc context
+Nếu `.context/modules/<module>.md` chưa tồn tại → đọc `GLOBAL.md` + hỏi human trước khi tạo.
 
-Trước khi làm bất kỳ task nào liên quan đến module X:
+### Context load rules
 
-```bash
-context-gen load src-tauri/src/vault . --include-manual
+| Folder | Load mặc định? | Mục đích |
+|---|---|---|
+| Root (`GLOBAL`, `PROJECT`, `MILESTONES`, `TENSIONS_*`) | Có | Governance |
+| `modules/` | Có — theo task | Design decisions, invariants |
+| `generated/` | Qua `context-gen load` | AST: functions, structs, commands |
+| `decisions/` | Khi liên quan | Decision records đã approve |
+| `planning/` | Không | Roadmap chi tiết (`MILESTONES_REFERENCE.md`) |
+| `proposals/` | Không | Brainstorm chưa approve |
+
+`TENSIONS_HISTORY.md` và `planning/` — chỉ đọc khi audit hoặc human yêu cầu.
+
+### context-gen — AST layer
+
+`context-gen` sinh `.context/generated/<path>.md` từ AST:
+
+```
+<!-- AUTO_START -->  … regenerate mỗi build, KHÔNG sửa tay … <!-- AUTO_END -->
+<!-- MANUAL_START --> … tool giữ nguyên nếu có trong generated file … <!-- MANUAL_END -->
 ```
 
-Lệnh này in ra context của module — cả [auto] lẫn [manual]. Đọc **[manual] trước**. [manual] chứa constraints mà code không thể hiện được.
-
-### Nếu [manual] còn placeholder
-
-File mới sinh ra có template như:
-
-```
-[manual] Design Decisions
-<!-- Viết tại đây -->
-
-[manual] Invariants & Constraints
-<!-- Viết tại đây -->
-```
-
-Nếu thấy `<!-- Viết tại đây -->` → **DỪNG task**. Hỏi human điền trước. Làm khi chưa có [manual] = làm khi chưa biết constraints = có thể vi phạm invariant mà không biết.
-
-### Sau khi thay đổi code
+**Source of truth cho [manual] protocol:** `.context/modules/<MODULE>.md` (human-friendly).
+**AST refresh:**
 
 ```bash
 context-gen build . --quiet
+context-gen load src-tauri/src/vault . --include-manual
 ```
 
-Lệnh này rebuild [auto] section cho tất cả module. Chạy sau mỗi lần thay đổi để [auto] không bị stale. Commit `.context/` cùng với code.
+### Nếu [manual] còn placeholder
 
-### Module index
+Trong `.context/modules/<module>.md`, nếu thấy `_Chưa có ghi chú._` hoặc `<!-- Viết tại đây -->` → **DỪNG task**, hỏi human điền trước.
 
-`.context/GLOBAL.md` chứa danh sách tất cả module và mô tả ngắn. Đọc file này đầu tiên nếu chưa biết task liên quan đến module nào.
+Module index (domain → file):
+
+| Module | File |
+|---|---|
+| Vault / SQLCipher | `modules/VAULT.md` |
+| Providers | `modules/PROVIDERS.md` |
+| Sync | `modules/SYNC.md` |
+| Confuse | `modules/CONFUSE.md` |
+| Tauri commands | `modules/COMMANDS.md` |
+| React UI | `modules/FRONTEND.md` |
+| App shell | `modules/APP.md` |
 
 ---
 
@@ -90,15 +94,14 @@ context-gen build . --quiet
 
 # Kiểm tra output
 ls .context/
-# Phải thấy: GLOBAL.md, MILESTONES.md, TENSIONS_OPEN.md, TENSIONS_ACTIVE.md, TENSIONS_HISTORY.md, và các file per-module
+# Phải thấy: README.md, GLOBAL.md, PROJECT.md, MILESTONES.md, TENSIONS_*.md
+#            modules/, generated/, decisions/, planning/
 
 # Khởi tạo tension V3 files nếu chưa có
 touch .context/TENSIONS_OPEN.md .context/TENSIONS_ACTIVE.md .context/TENSIONS_HISTORY.md .context/MILESTONES.md
 ```
 
-**Sau bước này**, mở từng file `.context/<module>.md` và điền `[manual]` section cho:
-- `src-tauri_src_vault` → invariant zeroize, Argon2id params, lý do SQLCipher
-- `src-tauri_src_providers` → routing table, lý do KHÔNG auto-sync
+**Sau bước này**, điền/duy trì `.context/modules/*.md` — đặc biệt `VAULT.md` và `PROVIDERS.md` trước khi implement M1+.
 
 ---
 
@@ -108,14 +111,14 @@ touch .context/TENSIONS_OPEN.md .context/TENSIONS_ACTIVE.md .context/TENSIONS_HI
 START
   │
   ▼
+Đọc .context/GLOBAL.md → PROJECT.md → MILESTONES.md → TENSIONS_*
 Đọc docs/vipavault-spec.md
-Xác định module liên quan
+Xác định module → đọc .context/modules/<MODULE>.md
   │
   ▼
-context-gen load <module> . --include-manual
-Đọc [manual] section
+context-gen load <source_path> . --include-manual  (AST từ generated/)
   │
-  ├── [manual] còn placeholder? → DỪNG. Hỏi human điền trước.
+  ├── modules/[manual] còn placeholder? → DỪNG. Hỏi human điền trước.
   │
   ▼
 Detect tension với constraint trong spec / [manual]?

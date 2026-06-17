@@ -1,9 +1,25 @@
-<!-- AUTO_START | hash: 09068922 | built: 2026-05-24T11:47 -->
-# Context: `src-tauri/src/vault`
+<!-- AUTO_START | hash: 66947b27 | built: 2026-06-17T15:06 -->
+# Context: `src-tauri/src/commands`
 
 > **[auto-generated — không sửa tay phần này]**  
 > Language: `rust`  
 > Source files: 1
+
+## [auto] Tauri Commands (IPC Bridge)
+
+Các hàm được expose ra frontend qua `invoke()`:
+
+- **`app_status`**
+  ```rust
+  pub fn app_status() -> AppStatus
+  ```
+
+## [auto] Key Imports
+
+```
+use crate::{foundation_status, AppStatus};
+use super::*;
+```
 
 <!-- AUTO_END -->
 

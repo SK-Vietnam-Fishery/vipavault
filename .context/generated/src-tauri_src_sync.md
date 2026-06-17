@@ -1,16 +1,9 @@
-<!-- AUTO_START | hash: 6584aa0a | built: 2026-05-24T11:47 -->
-# Context: `.`
+<!-- AUTO_START | hash: 5d1a97b8 | built: 2026-06-17T15:06 -->
+# Context: `src-tauri/src/sync`
 
 > **[auto-generated — không sửa tay phần này]**  
-> Language: `typescript`  
+> Language: `rust`  
 > Source files: 1
-
-## [auto] Key Imports
-
-```
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-```
 
 <!-- AUTO_END -->
 

@@ -1,26 +1,9 @@
-<!-- AUTO_START | hash: 47870b74 | built: 2026-05-24T11:47 -->
-# Context: `src`
+<!-- AUTO_START | hash: 09068922 | built: 2026-06-17T15:06 -->
+# Context: `src-tauri/src/vault`
 
 > **[auto-generated — không sửa tay phần này]**  
-> Language: `typescript`  
-> Source files: 3
-
-## [auto] Public Functions
-
-### `App` (line 1)
-```typescript
-export function App()
-```
-
-## [auto] Key Imports
-
-```
-import { render, screen } from "@testing-library/react";
-import { App } from "./App";
-import React from "react";
-import ReactDOM from "react-dom/client";
-import "./styles.css";
-```
+> Language: `rust`  
+> Source files: 1
 
 <!-- AUTO_END -->
 

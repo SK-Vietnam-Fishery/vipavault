@@ -1,9 +1,26 @@
-<!-- AUTO_START | hash: c4f7706d | built: 2026-05-24T11:47 -->
-# Context: `src-tauri/src/providers`
+<!-- AUTO_START | hash: 47870b74 | built: 2026-06-17T15:06 -->
+# Context: `src`
 
 > **[auto-generated — không sửa tay phần này]**  
-> Language: `rust`  
-> Source files: 1
+> Language: `typescript`  
+> Source files: 3
+
+## [auto] Public Functions
+
+### `App` (line 1)
+```typescript
+export function App()
+```
+
+## [auto] Key Imports
+
+```
+import { render, screen } from "@testing-library/react";
+import { App } from "./App";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./styles.css";
+```
 
 <!-- AUTO_END -->
 

@@ -1,5 +1,5 @@
-<!-- AUTO_START | hash: 5c23312e | built: 2026-05-24T11:47 -->
-# Context: `src/test`
+<!-- AUTO_START | hash: 6584aa0a | built: 2026-06-17T15:06 -->
+# Context: `.`
 
 > **[auto-generated — không sửa tay phần này]**  
 > Language: `typescript`  
@@ -8,7 +8,8 @@
 ## [auto] Key Imports
 
 ```
-import "@testing-library/jest-dom/vitest";
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 ```
 
 <!-- AUTO_END -->

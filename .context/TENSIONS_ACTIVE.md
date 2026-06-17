@@ -59,11 +59,27 @@ Options:    KeePass/KeeForm → không cần build | nhưng thêm dependency ngo
             Vault tích hợp → credential trong .hvault, mở portal bằng link trực tiếp
 Decision:   Vault riêng tích hợp. KeePass bị drop.
 Rationale:  App đã có vault mã hóa. Thêm KeePass = thêm dependency không cần thiết. Credential lưu trong .hvault, portal mở qua URL trong services table.
-Constraint: KHÔNG reintroduce KeePass dependency.
+Constraint: KHÔNG reintroduce KeePass dependency. KDBX export/import (nếu có) là scope khác — xem `vault_tier_model` và `.context/decisions/DECISION_VAULT_STORAGE.md`.
 Severity:   low
 Tags:       ux, credential, dependency
 Milestone:  V1
 Phase:      all
+
+---
+
+## 2026-06-17 | vault_tier_model
+Status:     RESOLVED_ACTIVE
+Tension:    KeePass/KDBX hierarchy (Company → Service → Sub-credential) vs SQLCipher schema + UI tree
+Options:    KeePass hybrid → native group tree cho secrets | nhưng bắt buộc dual-store (KDBX + SQL), sync risk, bypass confuse/audit nếu mở KeePassXC
+            SQLCipher + FK + UI tree → 1 file .hvault, dashboard/sync/audit native | hierarchy chỉ kém trực quan hơn KDBX groups
+Decision:   Giữ SQLCipher. Phân tầng 3–4 lớp qua multi-profile + services + service_credentials (mở rộng credential_type) + nested UI.
+Rationale:  Pain point brainstorm là UX hierarchy và domain model, không phải crypto. Schema spec đã cover Tier 1–3; KeePass không giảm complexity tổng thể vì vẫn cần SQL cho metadata/workflow. Brainstorm + phản biện: `.context/decisions/DECISION_VAULT_STORAGE.md`.
+Constraint: KHÔNG dùng KDBX làm primary vault backend V1. KHÔNG reopen trừ khi requirement cứng (compliance KDBX, IT bắt buộc KeePassXC daily, hoặc PoC hybrid pass).
+Severity:   high
+Tags:       storage, vault, ux, hierarchy, keepass
+Milestone:  V1
+Phase:      V1
+Ref:        .context/decisions/DECISION_VAULT_STORAGE.md
 
 ---
 

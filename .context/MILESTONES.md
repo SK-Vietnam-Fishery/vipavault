@@ -13,9 +13,9 @@ Meaning:
 - Domain, security, schema, provider routing, and sync rules define the hard boundary.
 - UX validates real workflows for admin/viewer users.
 - Work is delivered in vertical slices whenever possible: UI + IPC + backend + DB + tests.
-- The full roadmap lives in `.context/MILESTONES_REFERENCE.md`; this file keeps only the current phase, summary table, and the next 3-4 execution milestones.
+- The full roadmap lives in `.context/planning/MILESTONES_REFERENCE.md`; this file keeps only the current phase, summary table, and the next 3-4 execution milestones.
 
-Agents must load this file before planning work. Pull detail from `.context/MILESTONES_REFERENCE.md` only when the active execution milestone is about to change or the human asks for broader planning.
+Agents must load this file before planning work. Pull detail from `.context/planning/MILESTONES_REFERENCE.md` only when the active execution milestone is about to change or the human asks for broader planning.
 
 ---
 
