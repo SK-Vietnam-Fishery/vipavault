@@ -10,6 +10,7 @@ Mã hóa và lifecycle file `.hvault`: create, open, lock, multi-profile metadat
 
 ## [manual] Design Decisions — Phase: V1
 
+- **Vault engine = SQLCipher** (SQLite encrypted, file `.hvault`) — **không** MariaDB/MySQL/Postgres server. Tên “MariaDB” trong doc/product chỉ là *loại sub-credential lưu trong vault* (pass DB trên hosting), không phải stack backend app.
 - **SQLCipher** file-level encryption thay field-level — copy `.hvault` sang máy viewer đơn giản. Tension `storage`.
 - **Không** KeePass/KDBX backend — hierarchy 3 tầng qua schema + UI. `.context/decisions/DECISION_VAULT_STORAGE.md`.
 - Argon2id: salt 32 bytes, memory 64MB, iterations 3 (spec §3).

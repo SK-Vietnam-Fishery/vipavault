@@ -197,6 +197,15 @@ Chi tiết FULL extension: `.context/planning/MILESTONE_QUESTIONNAIRE.md` §Auth
 
 ## 4. Lưu trữ & mã hóa
 
+> **⚠️ Phân biệt bắt buộc (tránh agent/dev nhầm):**
+>
+> | Khái niệm | Công nghệ | Vai trò |
+> |-----------|-----------|---------|
+> | **Vault engine** (DB của app) | **SQLCipher** = SQLite mã hóa toàn file | Lưu toàn bộ schema quan hệ trong `*.hvault` — **không** MariaDB, MySQL, Postgres server |
+> | **Sub-credential** (dữ liệu *trong* vault) | Password/token của dịch vụ bên ngoài | VD: pass **MariaDB trên hosting**, SSH key, cPanel API token — chỉ là *bản ghi* trong bảng SQLCipher |
+>
+> Khi doc nói “MariaDB” → luôn hiểu là **loại secret khách hàng lưu**, không phải stack backend VipaVault.
+
 ### 4.1 SQLCipher — không KeePass backend
 
 ```mermaid
@@ -214,20 +223,26 @@ flowchart LR
   Field -.->|"maintenance mỗi column mới"| X2[Loại]
 ```
 
-**Lý do chính:** Use case “copy `.hvault` sang máy sếp” đơn giản với file-level encryption; dashboard, sync, audit, confuse đều cần SQL quan hệ native.
+**Lý do chính:** Use case “copy `.hvault` sang máy sếp” đơn giản với file-level encryption; dashboard, sync, audit, confuse đều cần SQL quan hệ native (SQLite/SQLCipher embedded — **không** DB server).
 
-### 4.2 Phân tầng dữ liệu (3 lớp)
+### 4.2 Phân tầng dữ liệu (3 lớp) — hierarchy *trong* SQLCipher
+
+Ba tầng dưới đây là **mô hình dữ liệu bên trong file `.hvault`**, không mô tả infrastructure bên ngoài app.
 
 ```mermaid
 flowchart TB
+  Engine["Vault engine: SQLCipher\n(SQLite encrypted — 1 file local)"]
   T1["Tầng 1 — Company profile\n(multi-profile / nhiều .hvault)"]
   T2["Tầng 2 — Service group\nhosting, email, domain, license"]
-  T3["Tầng 3 — Sub-credential\nMariaDB, SSH, cPanel token…"]
+  T3["Tầng 3 — Sub-credential\n(secrets của dịch vụ ngoài)\nVD: DB pass trên hosting, SSH, API token…"]
 
+  Engine --> T1
   T1 --> T2 --> T3
 ```
 
-Implement qua **FK trong SQL + UI tree** — không map sang KDBX groups.
+**Ví dụ tầng 3:** password MariaDB của website trên shared hosting — VipaVault lưu nó như một credential record; app **không** kết nối tới MariaDB server đó để chạy vault.
+
+Implement qua **FK trong SQLCipher + UI tree** — không map sang KDBX groups.
 
 ### 4.3 Invariants bảo mật (luôn áp dụng)
 
@@ -468,6 +483,7 @@ timeline
 
 | Câu hỏi | Trả lời ngắn |
 |---------|--------------|
+| Backend DB là MariaDB/MySQL? | **Không.** Engine = **SQLCipher** (SQLite mã hóa, file `.hvault`). “MariaDB” trong doc chỉ là *loại credential lưu trong vault* (pass DB trên hosting) |
 | Tại sao không Next.js? | Desktop Tauri + Vite SPA — không cần SSR/RSC |
 | `cargo test` cần `dist/` không? | **Không** (phương án B) |
 | `tauri dev` cần gì? | `npm run build` hoặc `npm run dev` (Vite :1420) |
@@ -501,3 +517,4 @@ timeline
 | 2026-06-18 | Khởi tạo — tổng hợp quyết định 0.1.0 + SIMPLE V1 + tensions active |
 | 2026-06-18 | §3.1 — sửa login UI: vault name + user name trước ô pass; backend 1 vault vẫn chỉ cần password |
 | 2026-06-18 | §3.1.2 — `operator_email`: backend lưu text, UI email + regex format, whoami fallback; không auth |
+| 2026-06-18 | §4 — phân biệt rõ vault engine (SQLCipher/SQLite) vs sub-credential (VD MariaDB pass trên hosting) |
