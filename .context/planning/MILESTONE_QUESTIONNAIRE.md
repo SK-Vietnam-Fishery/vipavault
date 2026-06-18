@@ -13,6 +13,7 @@
 2. Ghi rõ: **Quyết định** / **Chưa rõ — cần spike** / **Giữ nguyên spec**.
 3. Nếu đổi spec → tạo entry `.context/TENSIONS_OPEN.md` (severity `high` nếu ảnh hưởng security).
 4. Tag: `[ARCH]` kiến trúc · `[SEC]` bảo mật · `[UX]` giao diện · `[DATA]` schema · `[OPS]` vận hành · `[TEST]` kiểm thử · `[OPEN]` chưa có trong tài liệu
+5. Answer sẽ viết tắt là "A:"
 
 ### Tài liệu nền
 
@@ -29,11 +30,298 @@
 
 ### Gap ưu tiên (trả lời trước 0.2.0)
 
-1. `email_accounts` thiếu `sync_status` — spec §6 nói `pending_sync` nhưng SQL §4 chưa có column
-2. `app_settings` trong vault vs `app_settings.json` ngoài vault — phân chia key chưa rõ
-3. `credential_type` mở rộng — open decision trong `PROJECT.md`
-4. Migration boundary 0.1.1 vs 0.2.0 — vault create có chạy migration không
-5. README mô tả sai stack (Next.js/Prisma)
+1. `email_accounts` thiếu `sync_status`  
+   **A:** Thêm cột `sync_status` ở 0.2.0 (`local_only` | `pending_sync` | `synced` | `sync_error`).
+
+2. `app_settings` trong vault vs `app_settings.json` ngoài vault  
+   **A:** Tách rõ — xem bảng **Storage split** trong section Auth bên dưới.
+
+3. `credential_type` mở rộng  
+   **A:** *(chưa chốt — 4 loại spec hay thêm mariadb/postgres/redis)*
+
+4. Migration boundary 0.1.1 vs 0.2.0  
+   **A:** *(đề xuất: 0.1.1 tạo vault trống encrypted, 0.2.0 chạy migration lần đầu mở — chưa chốt)*
+
+5. README mô tả sai stack  
+   **A:** README cũ do LLM MS — rewrite cho đúng Tauri/Rust/React/SQLCipher khi làm 0.1.0 cleanup.
+
+---
+
+## Quyết định đã chốt — Auth & Sharing (SIMPLE V1 + FULL extension)
+
+> Ghi nhận từ planning trao đổi (2026-06). **Human approved.**  
+> **SIMPLE V1** implement trước; **FULL** là mở rộng sau V1 MVP. Cập nhật `docs/vipavault-spec.md` khi implement.
+
+### SIMPLE V1 — Login & roles (đã chốt)
+
+**Một yếu tố knowledge — không user account + password_hash:**
+
+1. **Master password** — mở SQLCipher `.hvault`.
+
+- **Không** email allowlist / `workspace_members` trong V1.
+- **Không** Settings → Share Workspace trong V1.
+- **Không** bảng `users` + `password_hash`.
+- **Roles:** `machine_role` + `sync_enabled` trong `app_settings.json` per-machine (IT = admin, CEO = viewer).
+- **Recovery:** không forgot-password trong app; backup `.hvault` + escrow master pass **ngoài app** — không reversible.
+- **PIN quick unlock:** defer sau V1 (0.11.0+ nếu làm).
+
+### Flow đăng nhập V1 (backend)
+
+```
+master_password
+  → SQLCipher open .hvault
+  → session unlocked, apply machine_role từ app_settings.json
+```
+
+### Màn login V1 — adaptive theo số vault (đã chốt)
+
+| Số vault (`profiles.json`) | Fields |
+|----------------------------|--------|
+| **1 vault** | **Mật khẩu** (master) — không select vault |
+| **≥ 2 vault** | **Vault** ▼ + **Mật khẩu** |
+
+```
+1 vault:
+┌──────────────────────────────────┐
+│ Mật khẩu: [ •••••••••••••••••• ] │
+│         [ Mở khóa ]              │
+└──────────────────────────────────┘
+```
+
+**Milestone V1:** unlock **0.1.1** (vault core) + **0.3.0** (UI shell).
+
+### Storage split (gap #2 — đã chốt)
+
+| Lưu ở đâu | Keys / tables | Mã hóa? | Đi theo copy .hvault? |
+|-----------|---------------|---------|----------------------|
+| **`app_settings.json`** (per-machine) | `machine_role`, `sync_enabled` | Không | **Không** — mỗi máy riêng |
+| **`profiles.json`** | `id`, `display_name`, `hvault_path` | Không | Tuỳ cách copy/setup |
+| **Trong `.hvault`** — `app_settings` table | `confuse_prefix`, `confuse_suffix`, … | SQLCipher | **Có** |
+
+**Không trùng key** giữa JSON ngoài vault và table trong vault.
+
+### Chia sẻ V1 — copy full vault
+
+- Copy **toàn bộ** `.hvault` sang máy viewer + set `machine_role: viewer` trên máy đích.
+- Viewer thấy **hết** nội dung trong file (read-only) — **không** partial copy trong V1.
+- Khuyến nghị ops: 1 vault = 1 phạm vi chia sẻ nếu cần tách dữ liệu sớm (multi-profile).
+
+### Audit V1
+
+- `activity_log.actor_note` — OS username hoặc free-text (vd. `"IT - Tuấn"`). **Không** bắt buộc email gate.
+
+### Chưa chốt (V1)
+
+- [ ] `credential_type` mở rộng (gap #3)
+- [ ] Migration boundary 0.1.1 vs 0.2.0 (gap #4)
+- [ ] Offboarding wizard: rotate master pass — milestone nào (0.3.0?)
+
+---
+
+## FULL extension — Share Package (subset export) `[Phase 1.5+]`
+
+> **Defer** sau V1 MVP. Thay thế ý tưởng email allowlist / Share Workspace cho use case “chỉ chia một phần vault”.
+
+### Mô hình (đã chốt hướng)
+
+**Share ≠ copy cả vault.** Admin **chọn** service / credential / email đưa vào gói → app tạo **file `.hvault` mới** (subset + FK liên quan).
+
+Ví dụ `whyscool.com`:
+
+```
+☑ Service Web Hosting + credential cPanel Admin
+☑ Email accounts (@whyscool.com)
+☐ Credential FTP backup
+☐ Service Domain / Registrar + credential Namecheap
+```
+
+Người nhận **không có** dữ liệu không được tick — không phải “có nhưng ẩn”.
+
+### Flow UX (đã chốt hướng) — người nhận tự đặt pass lần đầu
+
+**Có.** Admin **không** đặt master password lâu dài cho gói share. Thay vào đó:
+
+```
+[Admin] Settings → Tạo gói chia sẻ
+  → checklist tree (service → credential → email)
+  → app sinh mã kích hoạt một lần (one-time activation code)
+  → xuất whyscool_viewer.hvault + hiển thị mã cho admin (copy / QR — TBD)
+  → admin gửi FILE và MÃ qua hai kênh (hoặc cùng kênh nếu chấp nhận risk)
+
+[Người nhận] Mở app lần đầu với file gói
+  → detect vault chưa được “claim” (first_setup_pending)
+  → nhập mã kích hoạt từ IT
+  → màn “Đặt mật khẩu của bạn” (2 lần, policy min length)
+  → SQLCipher PRAGMA rekey → master password = của người nhận
+  → mã kích hoạt vô hiệu; lần sau chỉ dùng pass người nhận đã đặt
+```
+
+**Lợi ích:** IT không phải nhớ N mật khẩu cho N gói; CEO tự sở hữu pass trên máy mình; tooltip “admin giữ pass” không còn áp dụng cho admin — chuyển sang **mã kích hoạt một lần**.
+
+**Kỹ thuật (draft):** Export mã hóa file bằng key từ activation code (hoặc random setup key + hash lưu trong vault metadata `share_packages.setup_state`). First open: verify code → `rekey` sang pass người nhận → flag `claimed_at` / xóa setup state.
+
+- Gói share là **snapshot** — không auto-sync ngược vault admin (trừ khi thiết kế riêng sau).
+- `activity_log` / `cpanel_sync_cache` — mặc định **không** copy sang gói viewer (hoặc chỉ metadata dashboard).
+
+### Mật khẩu gói share — tooltip bắt buộc `[UX]` `[SEC]`
+
+**Phía admin** (wizard tạo gói — không có field master password):
+
+> **Bạn chỉ cần gửi mã kích hoạt cho người nhận.**  
+> Người nhận sẽ **tự đặt mật khẩu** khi mở gói lần đầu.  
+> Mã kích hoạt dùng **một lần** — không lưu lại sau khi đóng màn hình này.
+
+**Phía người nhận** (màn đặt pass lần đầu — icon ⓘ):
+
+> **Mật khẩu do bạn đặt — bạn phải tự lưu giữ.**  
+> Nếu quên, **không thể khôi phục** trong app (không có “Quên mật khẩu”).  
+> Liên hệ IT để nhận **gói chia sẻ mới** nếu cần.
+
+**Invariant implement:**
+
+- Admin wizard: hiển thị activation code **một lần**; checkbox *“Tôi đã copy mã / đã gửi cho người nhận.”* trước [Đóng].
+- Recipient first-setup: tooltip + checkbox *“Tôi hiểu mật khẩu không thể khôi phục nếu mất.”* trước [Hoàn tất].
+- Không lưu master password hay activation code trong app / keychain / `app_settings.json` sau khi flow kết thúc.
+- Mất **mã kích hoạt** trước khi claim → admin tạo gói mới. Mất **pass sau claim** → không recovery (giống vault thường).
+
+### KeePass/KeePassXC — có hỗ trợ không? → **Không đủ — đổ nợ kỹ thuật VipaVault**
+
+> Tham chiếu: `.context/decisions/DECISION_VAULT_STORAGE.md` — SQLCipher primary; KDBX chỉ optional export Phase 2+.
+
+| Tính năng Share Package | KeePass / KeePassXC | VipaVault phải tự làm |
+|-------------------------|---------------------|------------------------|
+| Export **subset** (chọn group/entry) | **Có — thủ công** (Export → file `.kdbx` mới, chọn entries) | Wizard checklist + FK integrity (`services` ↔ `credentials` ↔ `emails`) |
+| Chọn **từng credential**, bỏ domain registrar | **Không relational** — chỉ cây entry; metadata dashboard/sync không đi theo | SQL `SELECT` subset + strip `activity_log` / sync cache |
+| Người nhận **tự đặt pass lần đầu** (activation code → rekey) | **Không** — creator đặt master pass khi tạo/export DB; không có flow “claim” một lần | `first_setup_pending` + one-time code + SQLCipher `PRAGMA rekey` |
+| `machine_role` viewer / disable write | **Không** — mở file = full quyền sửa (trừ read-only file OS) | `app_settings.json` + UI/IPC gate |
+| Tooltip / không recovery | Cảnh báo chung; **không** flow share package | Wizard admin + first-setup recipient |
+| Gói share = **snapshot**, không sync ngược | Không — hai file `.kdbx` độc lập, sync thủ công | Explicit invariant + (sau) optional re-export |
+
+**Kết luận:** KeePass **không thay** milestone Share Package. Export KDBX (nếu làm Phase 2+) chỉ là **interop thô** cho IT quen KeePassXC — không có activation code, không viewer gate, không relational subset.
+
+### Technical debt — ghi khi tới milestone Share Package `[ARCH]` `[OPEN]`
+
+**Milestone đề xuất:** post-0.11.0 / Phase 1.5 (tên tạm: `0.12.0` hoặc `1.1.0` — chốt khi plan roadmap).
+
+| # | Nợ kỹ thuật | Ước lượng | Ghi chú |
+|---|-------------|-----------|---------|
+| TD-SHARE-01 | Subset export engine (SQL → new `.hvault`) | M | Copy rows theo selection; regenerate UUIDs hoặc giữ id — spike |
+| TD-SHARE-02 | Checklist UI tree (service → credential → email) | M | FRONTEND + IPC |
+| TD-SHARE-03 | One-time activation code + `first_setup_pending` metadata | M | SEC review; entropy / expiry |
+| TD-SHARE-04 | First-open flow: verify code → recipient pass → `rekey` | M | VAULT module; test zeroize |
+| TD-SHARE-05 | Admin one-time code display + “đã copy” gate | S | UX |
+| TD-SHARE-06 | Recipient tooltips + checkbox không recovery | S | UX copy đã chốt |
+| TD-SHARE-07 | FK orphan rules khi partial export | M | VD: share email không share parent service metadata? |
+| TD-SHARE-08 | (Optional) KDBX subset export — interop only | L | `keepass-db`; **không** thay TD-SHARE-01–06 |
+
+**Không borrow từ KeePass:** TD-SHARE-03, 04, 07 — không có reference implementation trong KeePass ecosystem.
+
+### Giải pháp đề xuất — research 2026-06 (Grok Build / web + SQLCipher docs)
+
+> **Kết luận:** Có lộ trình **không cần thư viện mới** — dùng SQLCipher + SQLite patterns đã có; UI/IPC là phần làm chính. KeePass/Bitwarden/1Password **không** copy được offline-first nhưng cho **mental model**.
+
+#### Kiến trúc tổng — 2 module Rust
+
+```
+share/export.rs   SharePackageExporter
+share/claim.rs    SharePackageClaimer
+share/manifest.rs SelectionManifest + FkClosureRules
+```
+
+#### Map nợ → giải pháp
+
+| Nợ | Giải pháp | Nguồn / pattern |
+|----|-----------|-----------------|
+| **TD-SHARE-01** | **ATTACH staging DB** → `INSERT INTO share.* SELECT … WHERE id IN (?)` theo manifest → `DETACH` → file `.hvault` mới. Schema: chạy migration V1 trên DB trống trước khi insert. Không cần `sqlcipher_export()` (copy full DB). | [SQLite copy between DBs](https://stackoverflow.com/questions/2359205/copying-data-from-one-sqlite-database-to-another); [SQLCipher ATTACH + KEY](https://www.zetetic.net/sqlcipher/sqlcipher-api/) |
+| **TD-SHARE-02** | Tree checkbox React — group theo `services.display_name` / `domain_primary`; leaf = `service_credentials`, `email_accounts`. IPC gửi `SelectionManifest` JSON. Pattern giống Bitwarden **Collections** (chọn tập con) nhưng offline. | [Bitwarden Collections](https://bitwarden.com/help/about-collections/) — concept only, cloud |
+| **TD-SHARE-03** | Sinh `activation_code` = 128-bit random → hiển thị dạng **nhóm từ** (hoặc Crockford base32). File gói mã hóa bằng **chính activation code** qua Argon2id (cùng params vault). Trong vault: `app_settings` keys `share_package=1`, `share_claimed=0`, `share_export_id=uuid`. | Tương tự “temporary password đổi lần đầu login” enterprise; **không** lưu code sau wizard |
+| **TD-SHARE-04** | First open: detect `share_claimed=0` → unlock bằng activation code → `PRAGMA rekey = recipient_pass` → set `share_claimed=1` → `zeroize()` buffers. Rust: `rusqlite` + feature SQLCipher, `connection.pragma_update(None, "rekey", …)`. | [SQLCipher PRAGMA rekey](https://www.zetetic.net/sqlcipher/sqlcipher-api/#rekey); [rusqlite pragma_update](https://docs.rs/rusqlite/latest/rusqlite/struct.Connection.html#method.pragma_update) |
+| **TD-SHARE-05–06** | Copy UX đã chốt — không thêm tech. | — |
+| **TD-SHARE-07** | **`FkClosureRules`** cố định trong manifest validator: (1) tick credential → auto include parent `service` row **metadata only**; (2) tick email → include parent service; (3) **không** auto-include sibling credentials; (4) `domains`/`ssl_certs` chỉ khi tick service domain hoặc tick explicit; (5) **never** copy `activity_log`, `cpanel_sync_cache` sang gói viewer (hoặc chỉ `sync_status` aggregate nếu cần dashboard). | App logic — không có off-shelf |
+| **TD-SHARE-08** | Cùng `SelectionManifest` → adapter `keepass-db` map sang Group/Entry. **Song song**, không thay pipeline SQLCipher. | `DECISION_VAULT_STORAGE.md` §6.3 |
+
+#### Flow kỹ thuật end-to-end (đề xuất implement)
+
+```
+[Export]
+1. Admin chọn manifest M
+2. Validate M với FkClosureRules
+3. CREATE empty share.hvault (migration 001)
+4. ATTACH share AS share KEY activation_code
+5. INSERT SELECT subset từ vault admin (main)
+6. INSERT app_settings: share_package, share_claimed=0
+7. DETACH → đóng file; admin thấy activation_code một lần
+
+[Claim]
+1. User add share.hvault vào profiles.json
+2. App thấy share_claimed=0 (cần unlock tạm bằng activation để đọc — hoặc plaintext header marker TBD spike)
+3. Nhập activation_code → unlock
+4. Nhập pass mới ×2 → PRAGMA rekey
+5. share_claimed=1; activation_code zeroized
+```
+
+**Spike cần làm trước code:** đọc `share_claimed` **trước** unlock — options: (A) sidecar `.hvault.meta` không nhạy cảm; (B) `PRAGMA cipher_plaintext_header_size` + magic bytes `VVSH` (tradeoff SEC — review); (C) luôn prompt “Đây là gói chia sẻ?” + activation field trên login.
+
+#### Tham chiếu SaaS (không dùng trực tiếp — offline khác)
+
+| Sản phẩm | Bài học cho VipaVault |
+|----------|----------------------|
+| **Bitwarden Collections** | Partial share + read-only permission — map sang manifest + `machine_role` |
+| **1Password Shared Vaults** | Tách vault theo scope — map sang multi-profile / share package file riêng |
+| **KeePass Export** | Subset thủ công — TD-SHARE-08 chỉ interop |
+| **age** | Optional: mã hóa thêm file `.hvault` khi truyền (USB/email) — **không** thay SQLCipher trong app |
+
+#### Ước lượng lại sau research
+
+| # | Trước | Sau | Lý do |
+|---|-------|-----|-------|
+| TD-SHARE-01 | M | **S–M** | ATTACH + INSERT SELECT — pattern chuẩn SQLite |
+| TD-SHARE-03 | M | **S** | Activation code = initial PRAGMA key, không crypto riêng |
+| TD-SHARE-04 | M | **S–M** | `PRAGMA rekey` documented, đã dùng trong vault core |
+| TD-SHARE-07 | M | **M** | Vẫn cần spec rules + tests — không rút gọn nhiều |
+
+**Tổng milestone Share Package:** ~2–3 vertical slices (export / claim / UI) — **khả thi post-0.11.0**, không blocker kiến trúc.
+
+### FULL — defer (không V1)
+
+- [ ] `workspace_members` + email gate login
+- [ ] Settings → Share Workspace (allowlist email)
+- [ ] `activity_log.actor_email`
+- [ ] PIN quick unlock
+- [ ] Share Package milestone + technical debt TD-SHARE-01–08 (post-0.11.0 / Phase 1.5)
+
+---
+
+## Schema draft — 0.2.0 (planning, chưa migrate)
+
+> Bổ sung spec §4. Human-approved planning; implement tại milestone **0.2.0**.  
+> **`workspace_members` — defer FULL**, không migration V1.
+
+### Bổ sung: `email_accounts.sync_status`
+
+```sql
+-- ALTER / migration 002 — column on existing table
+sync_status TEXT NOT NULL DEFAULT 'local_only'
+-- 'local_only' | 'pending_sync' | 'synced' | 'sync_error'
+```
+
+### `activity_log` V1
+
+Giữ `actor_note` (OS username hoặc free-text). `actor_email` — defer FULL (email gate).
+
+### `app_settings.json` schema (per-machine, ngoài vault)
+
+```json
+{
+  "machine_role": "admin",
+  "sync_enabled": true
+}
+```
+
+### Migration note (gap #4 — đề xuất, chưa chốt)
+
+- **0.1.1:** tạo file `.hvault` encrypted (có thể trống hoặc chỉ `schema_version`).
+- **0.2.0:** migration `001` tạo toàn bộ tables V1 (spec §4); chạy on first open / migrate path.
 
 ---
 

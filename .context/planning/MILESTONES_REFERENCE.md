@@ -26,6 +26,20 @@
 
 ---
 
+## V1 vs FULL (Phase 1.5+)
+
+| Capability | V1 (0.1.0–0.11.0) SIMPLE | FULL (post-0.11.0) |
+|------------|--------------------------|---------------------|
+| Login | Master password only | Optional email gate (TBD) |
+| Share | Full `.hvault` copy + `machine_role: viewer` | Share Package subset + activation claim |
+| Schema | No `workspace_members` | `workspace_members` if email gate approved |
+| Audit actor | `actor_note` | Optional `actor_email` |
+| PIN quick unlock | Defer | 0.11.0+ if implemented |
+
+Reference: `.context/planning/MILESTONE_QUESTIONNAIRE.md` §Auth, §FULL, TD-SHARE-*.
+
+---
+
 ## 0.1.0 — Project Foundation
 
 Goal: Establish runnable Tauri 2.x + React + TypeScript + Rust baseline.
@@ -43,50 +57,64 @@ Exit Criteria:
 
 ## 0.1.1 — Vault Core
 
-Goal: Implement safe `.hvault` lifecycle.
+Goal: Implement safe `.hvault` lifecycle (SIMPLE V1 unlock).
 
 Deliverables:
 - SQLCipher vault create/open/lock.
 - Argon2id key derivation.
 - zeroize key material.
 - No master password persistence.
+- Master-password unlock only (no email gate).
+- `profiles.json` when multiple vaults.
 
 Exit Criteria:
 - Vault lifecycle tests pass.
+- Multi-profile selection opens correct `.hvault`.
+- No `workspace_members` or email login.
 
 ---
 
 ## 0.2.0 — Data Model & Migrations
 
-Goal: Implement V1 schema as migrations.
+Goal: Implement V1 schema as migrations (SIMPLE V1 exclusions).
 
 Deliverables:
 - `services`
 - `service_credentials`
-- `email_accounts`
+- `email_accounts` (+ `sync_status` column)
 - `domains`
 - `ssl_certs`
-- `activity_log`
+- `activity_log` (`actor_note`; no `actor_email` in V1)
 - `cpanel_sync_cache`
-- `app_settings`
+- `app_settings` (in-vault table)
+- **Not in V1:** `workspace_members`
 
 Exit Criteria:
-- Migrations match spec and tests pass.
+- Migrations match spec with SIMPLE V1 auth exclusions.
+- No `workspace_members` table.
 
 ---
 
 ## 0.3.0 — App Shell & Roles
 
-Goal: Establish admin/viewer role boundary.
+Goal: Establish admin/viewer role boundary (SIMPLE V1 login UX).
 
 Deliverables:
 - Main shell.
-- App settings read path.
+- Login: master password; vault dropdown if ≥2 profiles.
+- `app_settings.json`: `machine_role`, `sync_enabled` only.
 - Viewer badge.
 - Write action gating.
+- Ops note: viewer = full vault copy + per-machine role (no Share wizard).
+
+Not in V1:
+- Email login, Share Workspace, `last_login_email`.
 
 Exit Criteria:
 - Viewer cannot write through UI or backend commands.
+- Login UI has no email field.
+
+Open: rotate master password wizard — milestone TBD.
 
 ---
 
@@ -197,7 +225,7 @@ Exit Criteria:
 
 ## 0.11.0 — MVP Hardening & Release
 
-Goal: Prepare MVP for real desktop use.
+Goal: Prepare MVP for real desktop use (SIMPLE V1 complete).
 
 Deliverables:
 - Auto-lock behavior.
@@ -208,3 +236,17 @@ Deliverables:
 
 Exit Criteria:
 - Desktop build succeeds and all required tests pass.
+- MVP scope excludes FULL extension (Share Package, email gate, PIN).
+- SIMPLE V1 auth/sharing invariants documented in release notes.
+
+---
+
+## Phase 1.5+ — FULL extension (not V1 execution)
+
+Deferred until human activates execution past 0.11.0:
+
+- **Share Package** — subset export, activation-code claim, recipient `PRAGMA rekey` (TD-SHARE-*).
+- **Workspace / email gate** — only if reopened (`workspace_members`, Share Workspace).
+- **PIN quick unlock** — admin machine only, if approved.
+
+Detail: `.context/planning/MILESTONE_QUESTIONNAIRE.md` §FULL. No milestone ID assigned until roadmap review.

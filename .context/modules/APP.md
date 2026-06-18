@@ -10,8 +10,9 @@ Tauri app bootstrap, workspace config, foundation milestone.
 ## [manual] Design Decisions
 
 - Tauri 2.x desktop target — không web-only deployment V1.
-- `app_settings.json` per-machine ngoài vault.
+- `app_settings.json` per-machine ngoài vault: `machine_role`, `sync_enabled`.
 - Data dir: `~/.vipavault/` (profiles + `.hvault` files).
+- Login V1: master password only (≥2 vault → profile dropdown). FULL: Share Package subset export — xem questionnaire §Auth.
 
 ## [manual] Invariants
 

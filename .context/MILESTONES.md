@@ -71,6 +71,27 @@ Rules:
 - SQLCipher is mandatory; do not replace with plain SQLite.
 - Master password is never stored.
 
+### SIMPLE V1 — Auth & sharing (human-approved 2026-06)
+
+Login:
+- Master password only — opens SQLCipher `.hvault`.
+- 1 vault: password field only. ≥2 vaults: profile dropdown + password.
+- No email allowlist, no `workspace_members`, no user accounts.
+
+Roles & sharing:
+- `machine_role` + `sync_enabled` in per-machine `app_settings.json` (outside vault).
+- CEO/viewer: copy full `.hvault` to viewer machine; set `machine_role: viewer`.
+- No partial vault export, no Share Package wizard in V1.
+
+Audit:
+- `activity_log.actor_note` only (OS username or free-text). No `actor_email` in V1.
+
+Deferred past 0.11.0 (Phase 1.5+ / FULL):
+- Share Package subset export, activation-code claim, `workspace_members`, PIN quick unlock.
+- Detail: `.context/planning/MILESTONE_QUESTIONNAIRE.md` §FULL.
+
+Auth UX source of truth: questionnaire §Auth — update `docs/vipavault-spec.md` when implementing 0.3.0.
+
 ---
 
 ## V1 Execution Overview
@@ -89,6 +110,8 @@ Rules:
 | 10 | 0.9.0 | Provider Email Apply | Vertical slice | Pending email changes apply to provider APIs | planned |
 | 11 | 0.10.0 | Confuse & Notification | Workflow/security slice | Confuse message generated only at send time | planned |
 | 12 | 0.11.0 | MVP Hardening & Release | Release slice | Packaged desktop MVP with tests passing | planned |
+
+**SIMPLE V1 gates:** 0.1.1 — master-password unlock only. 0.2.0 — no `workspace_members`; add `email_accounts.sync_status`. 0.3.0 — login UI + roles; no email gate / Share Workspace. 0.11.0 — MVP completes SIMPLE V1; FULL extension out of scope.
 
 ---
 
@@ -142,7 +165,9 @@ Scope:
 - Argon2id key derivation.
 - SQLCipher integration.
 - zeroize key material on lock/drop path.
-- Profile metadata outside vault.
+- Profile metadata outside vault (`profiles.json`).
+- Unlock with master password only (backend + minimal UI).
+- Multi-profile path when ≥2 vaults exist.
 
 Backend:
 - `src-tauri/src/vault`
@@ -150,22 +175,24 @@ Backend:
 - Error types that do not leak secrets.
 
 Frontend:
-- Minimal unlock/create vault flow for validation.
+- Minimal unlock/create flow: master password (+ vault selector if ≥2 profiles).
 - No credential browsing yet.
 
 Tests:
 - Encrypt/decrypt round trip.
-- Wrong password fails safely.
+- Wrong password fails safely without timing hints.
 - Lock zeroizes key material.
 - Master password is never persisted.
 
 Exit Criteria:
 - A new vault can be created, opened, locked, and reopened.
+- Multi-profile selection opens the correct `.hvault`.
 - Tests cover key lifecycle invariants.
 
 Constraints:
 - No `drop()` as key clearing substitute; use `zeroize()`.
 - No credential logging.
+- Do not implement `workspace_members` or email login.
 
 ---
 
@@ -176,7 +203,9 @@ Method: schema-led slice
 Goal: Make V1 schema real and migration-backed before UI workflows rely on data.
 
 Scope:
-- Add migrations for V1 tables from spec.
+- Add migrations for V1 tables from spec **except** `workspace_members` (FULL defer).
+- Add `email_accounts.sync_status` (`local_only` | `pending_sync` | `synced` | `sync_error`).
+- `activity_log`: use `actor_note`; do not add `actor_email` in V1.
 - Add data access boundaries for services, credentials, email accounts, domains, SSL certs, activity log, sync cache, app settings.
 - Keep OAuth schema out of V1 runtime logic.
 
@@ -188,17 +217,20 @@ Frontend:
 - None beyond smoke validation if needed.
 
 Tests:
-- Migration creates all required tables.
+- Migration creates all required V1 tables.
+- Schema has no `workspace_members`.
+- `sync_status` column exists on `email_accounts`.
 - Provider/auth scheme consistency is representable.
 - OAuth providers are not routed through `service_credentials`.
 
 Exit Criteria:
 - Empty vault migrates to V1 schema.
-- Schema matches `docs/vipavault-spec.md`.
+- Schema matches `docs/vipavault-spec.md` with SIMPLE V1 auth exclusions above.
 
 Constraints:
 - Spec wins over code when conflicts appear.
 - OAuth tables may be documented but OAuth flow remains Phase 2.
+- Do not migrate or seed email allowlist tables in V1.
 
 ---
 
@@ -210,10 +242,17 @@ Goal: Establish the admin/viewer experience boundary before write workflows exis
 
 Scope:
 - Main app layout.
+- SIMPLE V1 login screen: master password; vault dropdown if ≥2 profiles.
 - Profile switcher placeholder or initial implementation.
-- Per-machine `app_settings.json` handling.
+- Per-machine `app_settings.json`: `machine_role`, `sync_enabled` only.
 - `machine_role = admin | viewer`.
 - Viewer badge and write-action gating.
+- Document ops path: full `.hvault` copy for viewer (no in-app Share wizard).
+
+Not in V1 scope:
+- Email + master login.
+- Settings → Share Workspace.
+- Remember email / `last_login_email`.
 
 Backend:
 - Commands to read local app settings.
@@ -225,6 +264,7 @@ Frontend:
 - No provider API calls when `sync_enabled = false`.
 
 Tests:
+- Login UI has no email field.
 - Viewer mode disables write buttons.
 - Viewer mode prevents write IPC paths.
 - `sync_enabled = false` blocks provider API paths.
@@ -232,10 +272,15 @@ Tests:
 Exit Criteria:
 - Same app can run as admin or viewer.
 - Viewer cannot trigger writes through UI or backend command path.
+- Copied vault on viewer machine works with `machine_role: viewer` without allowlist.
 
 Constraints:
 - Do not build user account system.
 - Per-machine role config only.
+- Sharing in V1 is file copy + manual `app_settings.json`, not subset export.
+
+Open:
+- Rotate master password wizard — milestone TBD (questionnaire).
 
 ---
 
