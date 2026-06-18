@@ -19,11 +19,9 @@ pub fn app_info() -> AppStatus {
     }
 }
 
-pub fn run() {
-    tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![commands::app_status])
-        .run(tauri::generate_context!())
-        .expect("failed to run VipaVault application");
+/// Tauri builder for the desktop shell — safe to compile under `cargo test` (no `dist/`).
+pub fn build_app() -> tauri::Builder<tauri::Wry> {
+    tauri::Builder::default().invoke_handler(tauri::generate_handler![commands::app_status])
 }
 
 #[cfg(test)]
@@ -36,5 +34,10 @@ mod tests {
 
         assert_eq!(status.app_name, "VipaVault");
         assert_eq!(status.version, env!("CARGO_PKG_VERSION"));
+    }
+
+    #[test]
+    fn build_app_registers_app_status_command() {
+        let _app = build_app();
     }
 }

@@ -12,6 +12,8 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 [[bin]]
 name = "vipavault"
 path = "src/main.rs"
+test = false
+doc = false
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
