@@ -16,6 +16,8 @@ Meaning:
 - UX validates real workflows for admin/viewer users.
 - Work is delivered in vertical slices whenever possible: UI + IPC + backend + DB + tests.
 - The full roadmap lives in `.context/planning/MILESTONES_REFERENCE.md`; this file keeps only the current phase, summary table, and the next 3-4 execution milestones.
+- Agent automation slices (DAG, verify gates): `.context/planning/AGENT_AUTOMATION_PLAN.md`.
+- Foundation standards & commit workflow (AUTO→MANUAL): `.context/planning/FOUNDATION_WORKFLOW.md`.
 
 Agents must load this file before planning work. Pull detail from `.context/planning/MILESTONES_REFERENCE.md` only when the active execution milestone is about to change or the human asks for broader planning.
 

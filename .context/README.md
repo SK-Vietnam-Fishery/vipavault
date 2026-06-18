@@ -85,8 +85,10 @@ Roadmap chi tiết, không load mặc định:
 
 - `MILESTONES_REFERENCE.md` — full roadmap 0.1.0–0.11.0
 - `MILESTONE_QUESTIONNAIRE.md` — 132 câu hỏi planning theo milestone (dev trả lời trước implement)
+- `AGENT_AUTOMATION_PLAN.md` — DAG slice + gate verify + STOP rules (Mode: **AUTO** @ 0.1.0)
+- `FOUNDATION_WORKFLOW.md` — tiêu chuẩn Tauri/Rust/React + quy trình commit + AUTO→MANUAL
 
-Chỉ đọc khi đổi execution milestone hoặc human yêu cầu planning rộng.
+Chỉ đọc khi đổi execution milestone hoặc human yêu cầu planning rộng / chạy agent tự động.
 
 ---
 
