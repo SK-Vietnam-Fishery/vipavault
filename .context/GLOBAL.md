@@ -41,6 +41,10 @@ tauri
 
 Bắt đầu từ `.context/README.md` nếu folder trông rối.
 
+### Dev-facing decisions (ưu tiên human)
+
+- `docs/technical-decisions.md` — quyết định kỹ thuật đã chốt, sơ đồ Mermaid
+
 ### Module context (đọc khi làm task)
 
 | Module | File | Source |

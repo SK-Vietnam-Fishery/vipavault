@@ -17,7 +17,8 @@ Desktop app for managing hosting, email, and domain credentials — built for op
 
 OAuth providers (M365, Google Workspace) and Share Package export are **Phase 2+**.
 
-Full product spec: [`docs/vipavault-spec.md`](docs/vipavault-spec.md).
+Full product spec: [`docs/vipavault-spec.md`](docs/vipavault-spec.md).  
+Technical decisions (dev): [`docs/technical-decisions.md`](docs/technical-decisions.md).
 
 ---
 
