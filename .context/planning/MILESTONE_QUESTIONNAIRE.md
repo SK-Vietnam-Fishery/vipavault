@@ -73,17 +73,35 @@ master_password
   → session unlocked, apply machine_role từ app_settings.json
 ```
 
-### Màn login V1 — adaptive theo số vault (đã chốt)
+### Màn login V1 — UI vs backend (đã chốt / cập nhật 2026-06-18)
 
-| Số vault (`profiles.json`) | Fields |
-|----------------------------|--------|
-| **1 vault** | **Mật khẩu** (master) — không select vault |
-| **≥ 2 vault** | **Vault** ▼ + **Mật khẩu** |
+**Backend** (yếu tố knowledge): chỉ **master password** (+ chọn profile nếu ≥2 vault).
+
+**UI** — thứ tự **luôn** giống nhau:
+
+1. **Tên vault** — `profiles.json` → `display_name`
+2. **Tên người dùng** — read-only; `app_settings.json` → `operator_display_name`, fallback OS username
+3. **Mật khẩu** — input master password
+
+| Số vault | Row ① Tên vault | Row ② Người dùng | Row ③ Backend input |
+|----------|-----------------|------------------|---------------------|
+| **1 vault** | Label read-only | Label read-only | Chỉ mật khẩu |
+| **≥ 2 vault** | Dropdown chọn vault | Label read-only | Vault đã chọn + mật khẩu |
 
 ```
-1 vault:
+1 vault (UI — không chỉ một ô pass):
 ┌──────────────────────────────────┐
-│ Mật khẩu: [ •••••••••••••••••• ] │
+│ Vault:      Công ty A            │
+│ Người dùng: Tuấn (IT)            │
+│ Mật khẩu:   [ •••••••••••••••• ] │
+│         [ Mở khóa ]              │
+└──────────────────────────────────┘
+
+≥ 2 vault:
+┌──────────────────────────────────┐
+│ Vault:      [ Công ty A      ▼ ] │
+│ Người dùng: Tuấn (IT)            │
+│ Mật khẩu:   [ •••••••••••••••• ] │
 │         [ Mở khóa ]              │
 └──────────────────────────────────┘
 ```

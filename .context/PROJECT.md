@@ -6,7 +6,7 @@
 - **Storage:** SQLCipher file `.hvault` (AES-256-GCM toàn file), key từ Argon2id — **không** dùng KeePass/KDBX làm backend V1. Xem `.context/decisions/DECISION_VAULT_STORAGE.md`.
 - **Phân tầng vault (3–4 lớp):** Company profile → service group → sub-credentials — implement qua SQL FK + UI tree, không qua KDBX groups.
 - **Roles:** `admin` | `viewer` per-machine qua `app_settings.json` — không user account + password_hash.
-- **Login V1 (SIMPLE):** master password only; roles qua `app_settings.json`. Share subset vault (Share Package) + email gate — FULL extension; xem `.context/planning/MILESTONE_QUESTIONNAIRE.md` §Auth.
+- **Login V1 (SIMPLE):** backend — master password only; UI — vault name + user name (read-only) + password field (xem `docs/technical-decisions.md` §3.1). Roles qua `app_settings.json`. Share subset vault (Share Package) + email gate — FULL extension; xem `.context/planning/MILESTONE_QUESTIONNAIRE.md` §Auth.
 - **Providers V1:** `cpanel` + `directadmin` only; OAuth Phase 2.
 - **Sync:** Manual only, rate limit 1 lần / 10 phút / service.
 - Spec source of truth: `docs/vipavault-spec.md`.

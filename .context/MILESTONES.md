@@ -76,8 +76,10 @@ Rules:
 ### SIMPLE V1 — Auth & sharing (human-approved 2026-06)
 
 Login:
-- Master password only — opens SQLCipher `.hvault`.
-- 1 vault: password field only. ≥2 vaults: profile dropdown + password.
+- Master password only — opens SQLCipher `.hvault` (backend knowledge factor).
+- UI login screen order: **vault name** → **user name** (read-only) → **password** — always, including 1 vault.
+- Backend: 1 vault → password only; ≥2 vaults → profile selection + password.
+- UI: 1 vault → vault name as label (not dropdown); ≥2 vaults → vault dropdown on row ①.
 - No email allowlist, no `workspace_members`, no user accounts.
 
 Roles & sharing:
@@ -245,7 +247,7 @@ Goal: Establish the admin/viewer experience boundary before write workflows exis
 
 Scope:
 - Main app layout.
-- SIMPLE V1 login screen: master password; vault dropdown if ≥2 profiles.
+- SIMPLE V1 login screen: vault name → user name (read-only) → master password; vault dropdown on row ① if ≥2 profiles.
 - Profile switcher placeholder or initial implementation.
 - Per-machine `app_settings.json`: `machine_role`, `sync_enabled` only.
 - `machine_role = admin | viewer`.

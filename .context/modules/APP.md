@@ -14,7 +14,7 @@ Tauri app bootstrap, workspace config, foundation milestone.
 - Capabilities least-privilege: `src-tauri/capabilities/default.json` — `allow-app-status` + core defaults; window label `main`.
 - `app_settings.json` per-machine ngoài vault: `machine_role`, `sync_enabled`.
 - Data dir: `~/.vipavault/` (profiles + `.hvault` files).
-- Login V1: master password only (≥2 vault → profile dropdown). FULL: Share Package subset export — xem questionnaire §Auth.
+- Login V1: backend master password only; UI vault name → user name (read-only) → password (≥2 vault → dropdown row ①). FULL: Share Package — questionnaire §Auth.
 
 ## [manual] Invariants — Phase: 0.1.0
 

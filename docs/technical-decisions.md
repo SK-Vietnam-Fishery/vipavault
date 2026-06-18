@@ -72,25 +72,65 @@ Human approve 2026-06. Đây là ranh giới sản phẩm cho toàn Phase V1.
 
 ### 3.1 Đăng nhập
 
-```mermaid
-flowchart LR
-  Start([Mở app]) --> Count{≥ 2 vault\nprofiles?}
-  Count -->|Không| Pass1[Nhập master password]
-  Count -->|Có| Select[Chọn vault profile]
-  Select --> Pass2[Nhập master password]
-  Pass1 --> Unlock[Argon2id → mở SQLCipher]
-  Pass2 --> Unlock
-  Unlock --> App([App shell])
+**Tách backend và UI** — hay nhầm lẫn ở đây:
 
-  style Start fill:#e8f4fc
-  style App fill:#d4edda
+| Lớp | Quy tắc |
+|-----|---------|
+| **Backend** | Chỉ **master password** là yếu tố knowledge để mở SQLCipher. 1 vault → không cần chọn profile; ≥2 vault → cần `profile_id` / path. |
+| **UI (màn login)** | Luôn hiển thị theo thứ tự: **tên vault** → **tên người dùng** → **ô mật khẩu**. Hai dòng đầu là ngữ cảnh (read-only), không thay thế xác thực. |
+
+```mermaid
+flowchart TB
+  subgraph UI["Màn login — luôn cùng thứ tự"]
+    V["① Tên vault\nprofiles.json display_name"]
+    U["② Tên người dùng\nread-only — xem §3.1.1"]
+    P["③ Ô mật khẩu\nmaster password — input duy nhất khi 1 vault"]
+    V --> U --> P
+  end
+
+  subgraph Backend["Backend unlock"]
+    P --> Derive[Argon2id → SQLCipher]
+    Multi{≥ 2 vault?}
+    Multi -->|Có| Pick[profile_id từ bước ①]
+    Multi -->|Không| Single[profile mặc định]
+    Pick --> Derive
+    Single --> Derive
+    Derive --> App([App shell])
+  end
+```
+
+#### 3.1.1 Nguồn hiển thị trên UI
+
+| Field UI | 1 vault | ≥ 2 vault | Nguồn dữ liệu |
+|----------|---------|-----------|----------------|
+| Tên vault | Label read-only | Dropdown / select | `profiles.json` → `display_name` |
+| Tên người dùng | Label read-only | Label read-only | `app_settings.json` → `operator_display_name`; fallback tên OS user |
+| Mật khẩu | Input | Input | User nhập — **không lưu** |
+
+```
+1 vault (UI):
+┌──────────────────────────────────┐
+│ Vault:      Công ty A            │  ← read-only
+│ Người dùng: Tuấn (IT)            │  ← read-only
+│ Mật khẩu:   [ •••••••••••••••• ] │  ← input duy nhất (backend)
+│         [ Mở khóa ]              │
+└──────────────────────────────────┘
+
+≥ 2 vault (UI):
+┌──────────────────────────────────┐
+│ Vault:      [ Công ty A      ▼ ] │
+│ Người dùng: Tuấn (IT)            │
+│ Mật khẩu:   [ •••••••••••••••• ] │
+│         [ Mở khóa ]              │
+└──────────────────────────────────┘
 ```
 
 | Chốt | Không làm trong V1 |
 |------|-------------------|
-| Chỉ master password mở `.hvault` | Email login, user account |
-| 1 vault → 1 ô password | `workspace_members`, allowlist email |
-| ≥2 vault → dropdown + password | PIN quick unlock |
+| Backend: chỉ master password mở `.hvault` | Email login, user account + `password_hash` |
+| UI: luôn có tên vault + tên người dùng **trước** ô pass | Ẩn tên vault khi 1 profile |
+| ≥2 vault: dropdown **chỉ** ở dòng tên vault | PIN quick unlock |
+| | `workspace_members`, allowlist email |
 | | Remember email / `last_login_email` |
 
 ### 3.2 Vai trò & chia sẻ file
@@ -397,6 +437,7 @@ timeline
 | `tauri dev` cần gì? | `npm run build` hoặc `npm run dev` (Vite :1420) |
 | Credential OAuth lưu đâu? | `oauth_credentials` — Phase 2, không `service_credentials` |
 | Viewer có sync được không? | Chỉ khi `sync_enabled: true` **và** admin policy cho phép — mặc định viewer copy file + `sync_enabled: false` |
+| Login UI 1 vault chỉ 1 ô pass? | **Backend** đúng; **UI** vẫn hiện tên vault + tên người dùng trước ô pass |
 | Spec conflict với code? | **Sửa code**; sửa spec → tension HIGH |
 | Agent có tự activate milestone không? | **Không** — human activate |
 
@@ -421,3 +462,4 @@ timeline
 | Ngày | Thay đổi |
 |------|----------|
 | 2026-06-18 | Khởi tạo — tổng hợp quyết định 0.1.0 + SIMPLE V1 + tensions active |
+| 2026-06-18 | §3.1 — sửa login UI: vault name + user name trước ô pass; backend 1 vault vẫn chỉ cần password |

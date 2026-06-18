@@ -61,6 +61,7 @@ Phân quyền qua `app_settings.json` per-machine, không phải user account sy
 app_settings.json            ← Per-machine, NGOÀI vault
   sync_enabled: false        ← false = máy sếp (viewer)
   machine_role: viewer       ← 'admin' | 'viewer'
+  operator_display_name: "Tuấn (IT)"  ← hiển thị màn login (read-only); fallback OS username
 ```
 
 **Phân quyền máy sếp:** copy file `.hvault` sang máy sếp. `app_settings.json` set `machine_role: viewer`. Tất cả nút write bị disabled, badge "Chế độ xem" hiển thị.
