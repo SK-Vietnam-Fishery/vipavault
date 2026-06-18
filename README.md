@@ -1,69 +1,94 @@
 # VipaVault
 
-> **Vibe + Admin Vault + Vipafood = VipaVault for Hosting & Email** — bảng điều khiển dành cho CEO, không phải cho sysadmin.
+Desktop app for managing hosting, email, and domain credentials — built for operators and executives who need clarity without cPanel complexity.
 
-Quản lý website, domain, và email doanh nghiệp bằng ngôn ngữ bình thường. Không cPanel, không SSH, không ticket.
+**Stack:** Tauri 2.x · Rust · React · TypeScript · Vite · SQLCipher (`.hvault`)
+
+**License:** AGPL-3.0 — see [LICENSE](LICENSE).
 
 ---
 
-## ✨ Vì sao là VipaVault?
+## What it does (V1)
 
-Hosting panel truyền thống được làm cho kỹ thuật. **VipaVault** được làm cho founder, CEO, và team vận hành cần sự rõ ràng, kiểm soát và chi phí minh bạch.
+- Encrypted local vault (`.hvault`) with master-password unlock
+- cPanel and DirectAdmin provider sync (manual refresh, rate-limited)
+- Admin vs viewer machine roles via per-machine `app_settings.json`
+- CEO-friendly dashboard for services, domains, and email accounts
 
-**Vipa = Vibe + Admin + Vipafood**
+OAuth providers (M365, Google Workspace) and Share Package export are **Phase 2+**.
 
-## 🚀 Tính năng chính
+Full product spec: [`docs/vipavault-spec.md`](docs/vipavault-spec.md).
 
-### Executive-First
-- **CEO Dashboard** — uptime, chi phí, dung lượng, sức khỏe email trong 1 màn hình
-- **Plain-English Insights** — "Email gửi đi giảm 12%" thay vì lỗi SPF
-- **Cost Control** — chi phí hosting/email theo dự án, team, khách hàng
-- **One-Click Approvals** — duyệt gia hạn, nâng cấp từ Slack/email
+---
 
-### Hosting Made Simple
-- Deploy WordPress, Next.js, Laravel trong 60s
-- SSL tự động, backup hàng ngày, CDN toàn cầu
-- Staging → production kéo-thả, rollback 1 click
+## Prerequisites
 
-### Email Admin cho lãnh đạo
-- Kết nối Google Workspace, Microsoft 365, Postal
-- Theo dõi domain health (SPF, DKIM, DMARC)
-- Onboarding/offboarding nhân sự tự động
+Development uses **WSL Debian** (see `.local/ENVIRONMENT.md` on your machine — not committed).
 
-## 🛠️ Tech Stack
-- **Frontend:** Next.js 14, TypeScript, Tailwind, shadcn/ui
-- **Backend:** tRPC, Prisma, PostgreSQL
-- **Infra:** Docker, Traefik, Cloudflare, Hetzner/AWS
+| Tool | Version (reference) |
+|------|---------------------|
+| Node.js | 24.x (via nvm) |
+| Rust | 1.95+ |
+| context-gen | pip install from [context-mapping](https://github.com/WhySchools/context-mapping) |
 
-## 📦 Cài đặt
+---
+
+## Quick start (WSL)
 
 ```bash
-# 1. Clone
+# Clone
 git clone https://github.com/yourorg/vipavault.git
 cd vipavault
 
-# 2. Install
-pnpm install
+# Frontend deps
+npm install
 
-# 3. Config
-cp .env.example .env
-# chỉnh DATABASE_URL, AUTH_SECRET, CLOUDFLARE_API_KEY...
+# Production frontend build (required for Tauri)
+npm run build
 
-# 4. DB
-pnpm prisma migrate dev
+# Run tests
+npm run verify          # npm test + cargo test
 
-# 5. Run
-pnpm dev
+# Dev desktop app (Vite on :1420)
+npm run tauri dev
 ```
 
-## 💻 Sử dụng
-1. Tạo Organization
-2. Kết nối Providers (Cloudflare, Hetzner, Google Workspace)
-3. Mời team — gán role "CEO View" hoặc "Ops"
-4. Deploy — chọn template → gắn domain → launch
-
-## 📄 License
-MIT — Built for CEOs who don't want to be sysadmins.
+App data and `.hvault` files live outside the repo (e.g. `~/.vipavault/`), not in git.
 
 ---
-> *"Nếu cần hơn 3 click thì nó quá phức tạp."* — VipaVault Design Manifesto
+
+## Project layout
+
+```
+vipavault/
+  docs/vipavault-spec.md     # Product spec (source of truth)
+  src/                       # React + TypeScript (Vite)
+  src-tauri/                 # Rust backend + Tauri shell
+    src/vault/               # SQLCipher engine (0.1.1+)
+    src/providers/           # cPanel / DirectAdmin clients
+    src/commands/            # Tauri IPC commands
+  .context/                  # Architecture context (context-gen)
+```
+
+---
+
+## Verification (foundation milestone)
+
+```bash
+npm run verify
+context-gen build . --quiet
+context-gen check-consistency .
+```
+
+Agent workflow and slice DAG: `.context/planning/AGENT_AUTOMATION_PLAN.md`.
+
+---
+
+## Security notes
+
+- Master password is **never** stored
+- Vault file uses **SQLCipher** (AES-256-GCM at file level)
+- API tokens only — no cPanel main-password auth
+- Viewer mode: read-only; no provider API when `sync_enabled = false`
+
+See `AGENTS.md` for full architecture constraints.
