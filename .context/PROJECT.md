@@ -9,7 +9,7 @@
 - **Providers V1:** `cpanel` + `directadmin` only; OAuth Phase 2.
 - **Sync:** Manual only, rate limit 1 lần / 10 phút / service.
 - Spec source of truth: `docs/vipavault-spec.md`.
-- Milestone hiện tại: V1 / M0 Project Foundation.
+- Milestone hiện tại: V1 / 0.1.0 Project Foundation.
 
 ## [manual] Invariants
 
@@ -22,5 +22,5 @@
 
 ## [manual] Open Decisions
 
-- Chi tiết `credential_type` mở rộng (mariadb, postgres, …) — khi implement M5/M6.
+- Chi tiết `credential_type` mở rộng (mariadb, postgres, …) — khi implement 0.5.0/0.6.0.
 - KDBX export/import optional — Phase 2+ nếu cần.

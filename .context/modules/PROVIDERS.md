@@ -36,6 +36,6 @@ Route `provider_type` + `auth_scheme` tới đúng client và credential table.
 
 ## [manual] Behavior chưa implement
 
-- cPanel UAPI client (Email add/reset/list/delete) — M7+.
-- DirectAdmin client — M7.
+- cPanel UAPI client (Email add/reset/list/delete) — 0.7.0+.
+- DirectAdmin client — 0.7.0.
 - OAuth clients — Phase 2.

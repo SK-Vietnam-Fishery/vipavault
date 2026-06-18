@@ -83,7 +83,8 @@ Roadmap chi tiết, không load mặc định:
 .context/planning/
 ```
 
-- `MILESTONES_REFERENCE.md` — full roadmap M0–M11
+- `MILESTONES_REFERENCE.md` — full roadmap 0.1.0–0.11.0
+- `MILESTONE_QUESTIONNAIRE.md` — 132 câu hỏi planning theo milestone (dev trả lời trước implement)
 
 Chỉ đọc khi đổi execution milestone hoặc human yêu cầu planning rộng.
 

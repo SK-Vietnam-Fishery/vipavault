@@ -1,7 +1,9 @@
 # Milestones — VipaVault
 
 Current: V1
-Active Execution: M0 — Project Foundation
+Active Execution: 0.1.0 — Project Foundation
+
+**Version ID convention:** bootstrap `0.1.0`–`0.1.1`; mọi milestone sau đó `0.N.0` tăng dần (`0.2.0` … `0.11.0`). Không dùng `0.1.4` kiểu patch lẫn minor.
 
 ---
 
@@ -73,24 +75,24 @@ Rules:
 
 ## V1 Execution Overview
 
-| ID | Milestone | Method | Primary Outcome | Status |
-|---|---|---|---|---|
-| M0 | Project Foundation | Foundation slice | Tauri/Rust/React/test/context baseline works | current |
-| M1 | Vault Core | Security-led backend slice | Create/open/lock `.hvault` safely | planned |
-| M2 | Data Model & Migrations | Schema-led slice | V1 schema and migrations match spec | planned |
-| M3 | App Shell & Roles | UX workflow slice | Admin/viewer shell with enforced role gates | planned |
-| M4 | Dashboard Slice | Vertical slice | Dashboard reads real local data and alert thresholds | planned |
-| M5 | Credential Management | Vertical slice | Admin credential viewer/editor with no secret leakage | planned |
-| M6 | Email Accounts Local | Vertical slice | Local email lifecycle with generated passwords and audit | planned |
-| M7 | Provider Routing V1 | Domain/provider slice | cPanel/DirectAdmin routing and unknown-provider skip | planned |
-| M8 | Manual Sync & Rate Limit | Security/provider slice | Refresh sync with hard rate limit | planned |
-| M9 | Provider Email Apply | Vertical slice | Pending email changes apply to provider APIs | planned |
-| M10 | Confuse & Notification | Workflow/security slice | Confuse message generated only at send time | planned |
-| M11 | MVP Hardening & Release | Release slice | Packaged desktop MVP with tests passing | planned |
+| # | ID | Milestone | Method | Primary Outcome | Status |
+|---|---|---|---|---|---|
+| 1 | 0.1.0 | Project Foundation | Foundation slice | Tauri/Rust/React/test/context baseline works | current |
+| 2 | 0.1.1 | Vault Core | Security-led backend slice | Create/open/lock `.hvault` safely | planned |
+| 3 | 0.2.0 | Data Model & Migrations | Schema-led slice | V1 schema and migrations match spec | planned |
+| 4 | 0.3.0 | App Shell & Roles | UX workflow slice | Admin/viewer shell with enforced role gates | planned |
+| 5 | 0.4.0 | Dashboard Slice | Vertical slice | Dashboard reads real local data and alert thresholds | planned |
+| 6 | 0.5.0 | Credential Management | Vertical slice | Admin credential viewer/editor with no secret leakage | planned |
+| 7 | 0.6.0 | Email Accounts Local | Vertical slice | Local email lifecycle with generated passwords and audit | planned |
+| 8 | 0.7.0 | Provider Routing V1 | Domain/provider slice | cPanel/DirectAdmin routing and unknown-provider skip | planned |
+| 9 | 0.8.0 | Manual Sync & Rate Limit | Security/provider slice | Refresh sync with hard rate limit | planned |
+| 10 | 0.9.0 | Provider Email Apply | Vertical slice | Pending email changes apply to provider APIs | planned |
+| 11 | 0.10.0 | Confuse & Notification | Workflow/security slice | Confuse message generated only at send time | planned |
+| 12 | 0.11.0 | MVP Hardening & Release | Release slice | Packaged desktop MVP with tests passing | planned |
 
 ---
 
-## M0 — Project Foundation
+## 0.1.0 — Project Foundation
 
 Status: current
 Method: foundation slice
@@ -129,7 +131,7 @@ Constraints:
 
 ---
 
-## M1 — Vault Core
+## 0.1.1 — Vault Core
 
 Status: planned
 Method: security-led backend slice
@@ -167,7 +169,7 @@ Constraints:
 
 ---
 
-## M2 — Data Model & Migrations
+## 0.2.0 — Data Model & Migrations
 
 Status: planned
 Method: schema-led slice
@@ -180,7 +182,7 @@ Scope:
 
 Backend:
 - `src-tauri/migrations`
-- Storage/repository functions needed by M3/M4.
+- Storage/repository functions needed by 0.3.0/0.4.0.
 
 Frontend:
 - None beyond smoke validation if needed.
@@ -200,7 +202,7 @@ Constraints:
 
 ---
 
-## M3 — App Shell & Roles
+## 0.3.0 — App Shell & Roles
 
 Status: planned
 Method: UX workflow slice
@@ -237,7 +239,7 @@ Constraints:
 
 ---
 
-## M4 — Dashboard Slice
+## 0.4.0 — Dashboard Slice
 
 Status: planned
 Method: vertical slice

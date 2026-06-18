@@ -19,7 +19,7 @@ Sinh confuse string **chỉ lúc gửi** thông báo; vault luôn lưu pass th�
 - Confuse string chỉ tồn tại runtime khi compose message.
 - Không persist confuse output vào credential tables.
 
-## [manual] Behavior chưa implement — M10
+## [manual] Behavior chưa implement — 0.10.0
 
 - Compose Zalo/email templates.
 - Decode hint cho recipient (bỏ N đầu M cuối).

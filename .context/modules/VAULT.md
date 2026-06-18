@@ -21,7 +21,7 @@ Mã hóa và lifecycle file `.hvault`: create, open, lock, multi-profile metadat
 - Clear key material bằng `zeroize()` — **không** dùng `drop()` thay thế.
 - Không log master password, derived key, hay plaintext credential.
 - Lock/idle timeout → zeroize key trước khi đóng SQLCipher connection.
-- M1 scope: vault crypto trước khi UI credential phụ thuộc.
+- 0.1.1 scope: vault crypto trước khi UI credential phụ thuộc.
 
 ## [manual] Test Strategy
 
@@ -30,7 +30,7 @@ Mã hóa và lifecycle file `.hvault`: create, open, lock, multi-profile metadat
 - Lock path zeroizes — test với mock/key inspection pattern.
 - Master password never written to disk or app settings.
 
-## [manual] Behavior chưa implement — Milestone M1
+## [manual] Behavior chưa implement — Milestone 0.1.1
 
 - Create/open/lock `.hvault` commands.
 - SQLCipher + rusqlite (or equivalent) integration.

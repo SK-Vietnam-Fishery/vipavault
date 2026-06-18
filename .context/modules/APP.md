@@ -15,9 +15,9 @@ Tauri app bootstrap, workspace config, foundation milestone.
 
 ## [manual] Invariants
 
-- Không implement product behavior sớm trong M0 — chỉ baseline tests + context.
+- Không implement product behavior sớm trong 0.1.0 — chỉ baseline tests + context.
 
 ## [manual] Milestone
 
-- Current execution: **M0 Project Foundation**
+- Current execution: **0.1.0 Project Foundation**
 - Exit: `cargo test` + `npm test` + `context-gen build` pass.

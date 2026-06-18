@@ -20,7 +20,18 @@ Tauri 2.x desktop app quản lý hosting/email/domain credential.
 Layout `.context/` theo mô hình phân tầng (tham khảo `../skvn-marine`). Chi tiết folder: **`.context/README.md`**.
 
 Project dùng **context-gen** cho AST facts + **`.context/modules/`** cho decisions/invariants human-readable.
-Máy local có thể có hướng dẫn riêng trong `LOCAL_CONTEXT_GEN.md` (gitignored).
+
+### Local environment (machine-specific)
+
+Thông tin môi trường máy hiện tại nằm trong **`.local/`** (gitignored, không commit) — mô hình tham khảo `../skvn-marine`:
+
+| File | Mục đích |
+|---|---|
+| `.local/ENVIRONMENT.md` | Source of truth: WSL distro, paths, toolchain versions, lệnh chạy sẵn (`NPM_TEST_CMD`, `CARGO_TEST_CMD`, `TAURI_DEV_CMD`, …) |
+| `.local/LOCAL_CONTEXT_GEN.md` | Hướng dẫn context-gen trên máy này |
+| `.local/write-env.sh` | Regenerate `ENVIRONMENT.md` sau khi đổi toolchain |
+
+Agent **phải đọc `.local/ENVIRONMENT.md`** trước khi chạy `npm`, `cargo`, `tauri dev`, hoặc `context-gen`. Không cài Node/Rust toolchain vào source repo.
 
 ### Đọc trước — Bắt buộc mỗi task
 
@@ -101,7 +112,7 @@ ls .context/
 touch .context/TENSIONS_OPEN.md .context/TENSIONS_ACTIVE.md .context/TENSIONS_HISTORY.md .context/MILESTONES.md
 ```
 
-**Sau bước này**, điền/duy trì `.context/modules/*.md` — đặc biệt `VAULT.md` và `PROVIDERS.md` trước khi implement M1+.
+**Sau bước này**, điền/duy trì `.context/modules/*.md` — đặc biệt `VAULT.md` và `PROVIDERS.md` trước khi implement 0.1.1+.
 
 ---
 

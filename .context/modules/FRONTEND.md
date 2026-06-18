@@ -10,14 +10,14 @@ React + TypeScript + Vite UI; admin vs viewer presentation.
 
 ## [manual] Design Decisions
 
-- M0: boot shell only — validate stack wiring.
-- Dashboard, Email Manager, Hosting List — vertical slices M3+.
+- 0.1.0: boot shell only — validate stack wiring.
+- Dashboard, Email Manager, Hosting List — vertical slices 0.3.0+.
 - Viewer: badge "Chế độ xem", disable write controls.
 
 ## [manual] Invariants & Constraints
 
 - **KHÔNG** enable write buttons khi `machine_role = viewer`.
-- Alert thresholds: đỏ < 7 ngày, vàng 7–30, xanh còn lại — test ở M4.
+- Alert thresholds: đỏ < 7 ngày, vàng 7–30, xanh còn lại — test ở 0.4.0.
 
 ## [manual] Test Strategy
 
@@ -26,5 +26,5 @@ React + TypeScript + Vite UI; admin vs viewer presentation.
 
 ## [manual] Behavior chưa implement
 
-- Profile switcher, unlock flow — M1/M3.
-- Nested credential tree UI — M5+ (tier model).
+- Profile switcher, unlock flow — 0.1.1/0.3.0.
+- Nested credential tree UI — 0.5.0+ (tier model).

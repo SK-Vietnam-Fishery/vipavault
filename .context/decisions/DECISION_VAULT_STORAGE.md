@@ -3,7 +3,7 @@
 **Status:** APPROVED  
 **Date:** 2026-06-17  
 **Approved by:** Human — "Giữ SQLCipher"  
-**Milestone:** V1 / M0–M1 boundary  
+**Milestone:** V1 / 0.1.0–0.1.1 boundary  
 **Related tensions:** `storage`, `autofill_mechanism`, `vault_tier_model` (new)  
 **Severity:** HIGH
 
@@ -204,7 +204,7 @@ KeePassXC có screenshot protection ([User Guide § Screenshot Security](https:/
 | Copy sang viewer | 1 file | 1–2 files |
 | Crypto surface | SQLCipher + Argon2id | keepass-db + (SQL?) |
 | Interop KeePassXC | Không | Có — **nhưng bypass app controls** |
-| M1 implementation | Đã planned | Split vault + mapping layer |
+| 0.1.1 implementation | Đã planned | Split vault + mapping layer |
 | Align spec hiện tại | **Có** | Cần rewrite §2–4 |
 
 ---
@@ -252,7 +252,7 @@ Chỉ xem xét KeePass backend khi có **requirement cứng**:
 2. Compliance yêu cầu file vault ở format KDBX chuẩn, hoặc
 3. PoC chứng minh hybrid sync đáp ứng dashboard + audit + confuse invariant
 
-Khi đó: spike `keepass-db` + document dual-store transaction design trước M1.
+Khi đó: spike `keepass-db` + document dual-store transaction design trước 0.1.1.
 
 ---
 

@@ -3,28 +3,30 @@
 > Full V1 roadmap reference.
 > Do not load by default. Pull details into `.context/MILESTONES.md` when a milestone approaches or human asks.
 
+**Version ID convention:** bootstrap `0.1.0`–`0.1.1`; mọi milestone sau đó `0.N.0` tăng dần (`0.2.0` … `0.11.0`).
+
 ---
 
 ## Summary
 
-| ID | Milestone | Primary Outcome |
-|---|---|---|
-| M0 | Project Foundation | Tauri/Rust/React/test/context baseline works |
-| M1 | Vault Core | Create/open/lock `.hvault` safely |
-| M2 | Data Model & Migrations | V1 schema and migrations match spec |
-| M3 | App Shell & Roles | Admin/viewer shell with enforced role gates |
-| M4 | Dashboard Slice | Dashboard reads real local data and alert thresholds |
-| M5 | Credential Management | Admin credential viewer/editor with no secret leakage |
-| M6 | Email Accounts Local | Local email lifecycle with generated passwords and audit |
-| M7 | Provider Routing V1 | cPanel/DirectAdmin routing and unknown-provider skip |
-| M8 | Manual Sync & Rate Limit | Refresh sync with hard rate limit |
-| M9 | Provider Email Apply | Pending email changes apply to provider APIs |
-| M10 | Confuse & Notification | Confuse message generated only at send time |
-| M11 | MVP Hardening & Release | Packaged desktop MVP with tests passing |
+| # | ID | Milestone | Primary Outcome |
+|---|---|---|---|
+| 1 | 0.1.0 | Project Foundation | Tauri/Rust/React/test/context baseline works |
+| 2 | 0.1.1 | Vault Core | Create/open/lock `.hvault` safely |
+| 3 | 0.2.0 | Data Model & Migrations | V1 schema and migrations match spec |
+| 4 | 0.3.0 | App Shell & Roles | Admin/viewer shell with enforced role gates |
+| 5 | 0.4.0 | Dashboard Slice | Dashboard reads real local data and alert thresholds |
+| 6 | 0.5.0 | Credential Management | Admin credential viewer/editor with no secret leakage |
+| 7 | 0.6.0 | Email Accounts Local | Local email lifecycle with generated passwords and audit |
+| 8 | 0.7.0 | Provider Routing V1 | cPanel/DirectAdmin routing and unknown-provider skip |
+| 9 | 0.8.0 | Manual Sync & Rate Limit | Refresh sync with hard rate limit |
+| 10 | 0.9.0 | Provider Email Apply | Pending email changes apply to provider APIs |
+| 11 | 0.10.0 | Confuse & Notification | Confuse message generated only at send time |
+| 12 | 0.11.0 | MVP Hardening & Release | Packaged desktop MVP with tests passing |
 
 ---
 
-## M0 — Project Foundation
+## 0.1.0 — Project Foundation
 
 Goal: Establish runnable Tauri 2.x + React + TypeScript + Rust baseline.
 
@@ -39,7 +41,7 @@ Exit Criteria:
 
 ---
 
-## M1 — Vault Core
+## 0.1.1 — Vault Core
 
 Goal: Implement safe `.hvault` lifecycle.
 
@@ -54,7 +56,7 @@ Exit Criteria:
 
 ---
 
-## M2 — Data Model & Migrations
+## 0.2.0 — Data Model & Migrations
 
 Goal: Implement V1 schema as migrations.
 
@@ -73,7 +75,7 @@ Exit Criteria:
 
 ---
 
-## M3 — App Shell & Roles
+## 0.3.0 — App Shell & Roles
 
 Goal: Establish admin/viewer role boundary.
 
@@ -88,7 +90,7 @@ Exit Criteria:
 
 ---
 
-## M4 — Dashboard Slice
+## 0.4.0 — Dashboard Slice
 
 Goal: First end-to-end read-only product workflow.
 
@@ -103,7 +105,7 @@ Exit Criteria:
 
 ---
 
-## M5 — Credential Management
+## 0.5.0 — Credential Management
 
 Goal: Manage local credentials without provider API dependency.
 
@@ -118,7 +120,7 @@ Exit Criteria:
 
 ---
 
-## M6 — Email Accounts Local
+## 0.6.0 — Email Accounts Local
 
 Goal: Model email account workflows locally before provider apply.
 
@@ -133,7 +135,7 @@ Exit Criteria:
 
 ---
 
-## M7 — Provider Routing V1
+## 0.7.0 — Provider Routing V1
 
 Goal: Implement provider abstraction without OAuth scope creep.
 
@@ -147,7 +149,7 @@ Exit Criteria:
 
 ---
 
-## M8 — Manual Sync & Rate Limit
+## 0.8.0 — Manual Sync & Rate Limit
 
 Goal: Sync provider state only by explicit user action.
 
@@ -162,7 +164,7 @@ Exit Criteria:
 
 ---
 
-## M9 — Provider Email Apply
+## 0.9.0 — Provider Email Apply
 
 Goal: Apply reviewed local email changes to cPanel/DirectAdmin.
 
@@ -178,7 +180,7 @@ Exit Criteria:
 
 ---
 
-## M10 — Confuse & Notification
+## 0.10.0 — Confuse & Notification
 
 Goal: Generate notification-safe password messages.
 
@@ -193,7 +195,7 @@ Exit Criteria:
 
 ---
 
-## M11 — MVP Hardening & Release
+## 0.11.0 — MVP Hardening & Release
 
 Goal: Prepare MVP for real desktop use.
 
@@ -206,4 +208,3 @@ Deliverables:
 
 Exit Criteria:
 - Desktop build succeeds and all required tests pass.
-

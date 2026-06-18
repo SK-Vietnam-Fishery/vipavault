@@ -9,13 +9,13 @@ use serde::Serialize;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct AppStatus {
     pub app_name: &'static str,
-    pub milestone: &'static str,
+    pub version: &'static str,
 }
 
-pub fn foundation_status() -> AppStatus {
+pub fn app_info() -> AppStatus {
     AppStatus {
         app_name: "VipaVault",
-        milestone: "M0 Project Foundation",
+        version: env!("CARGO_PKG_VERSION"),
     }
 }
 
@@ -31,10 +31,10 @@ mod tests {
     use super::*;
 
     #[test]
-    fn foundation_status_identifies_m0() {
-        let status = foundation_status();
+    fn app_info_exposes_package_version() {
+        let status = app_info();
 
         assert_eq!(status.app_name, "VipaVault");
-        assert_eq!(status.milestone, "M0 Project Foundation");
+        assert_eq!(status.version, env!("CARGO_PKG_VERSION"));
     }
 }

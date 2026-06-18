@@ -27,7 +27,7 @@ Refresh data từ provider API theo yêu cầu user; enforce rate limit.
 - Per-service isolation: service A sync không block service B.
 - Viewer/sync_disabled guard ở command layer.
 
-## [manual] Behavior chưa implement — M8+
+## [manual] Behavior chưa implement — 0.8.0+
 
 - Sync worker + `cpanel_sync_cache` update.
 - Pending email apply flow.

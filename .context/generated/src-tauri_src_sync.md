@@ -1,4 +1,4 @@
-<!-- AUTO_START | hash: 5d1a97b8 | built: 2026-06-17T15:06 -->
+<!-- AUTO_START | hash: 5d1a97b8 | built: 2026-06-17T16:47 -->
 # Context: `src-tauri/src/sync`
 
 > **[auto-generated — không sửa tay phần này]**  
