@@ -13,7 +13,7 @@ React + TypeScript + Vite UI; admin vs viewer presentation.
 - 0.1.0: boot shell only — validate stack wiring.
 - Dashboard, Email Manager, Hosting List — vertical slices 0.3.0+.
 - Viewer: badge "Chế độ xem", disable write controls.
-- Login V1 UI (0.3.0): thứ tự cố định — **tên vault** (label hoặc dropdown) → **tên người dùng** (read-only, `app_settings.operator_display_name` hoặc OS user) → **master password**. Backend 1 vault chỉ cần password; không ẩn hai dòng đầu. FULL Share Package wizard: tooltip + checkbox “mật khẩu gói không khôi phục được”.
+- Login V1 UI (0.3.0): vault (label/▼) → **email label** (từ IPC `get_app_settings`) → master password. Lần đầu: ô email → backend `set_operator_email` + regex → label. Không auth email. FULL Share Package wizard: tooltip + checkbox “mật khẩu gói không khôi phục được”.
 
 ## [manual] Invariants & Constraints
 

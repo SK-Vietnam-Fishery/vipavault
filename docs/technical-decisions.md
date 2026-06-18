@@ -77,61 +77,97 @@ Human approve 2026-06. Đây là ranh giới sản phẩm cho toàn Phase V1.
 | Lớp | Quy tắc |
 |-----|---------|
 | **Backend** | Chỉ **master password** là yếu tố knowledge để mở SQLCipher. 1 vault → không cần chọn profile; ≥2 vault → cần `profile_id` / path. |
-| **UI (màn login)** | Luôn hiển thị theo thứ tự: **tên vault** → **tên người dùng** → **ô mật khẩu**. Hai dòng đầu là ngữ cảnh (read-only), không thay thế xác thực. |
+| **UI (màn login)** | Luôn hiển thị theo thứ tự: **tên vault** → **email operator** → **ô mật khẩu**. Hai dòng đầu là ngữ cảnh (read-only sau lần đầu), không thay thế xác thực. |
+| **Operator email** | Chuỗi text plaintext — **backend** (Rust) đọc/ghi `app_settings.json` → `operator_email`. Regex format đơn giản khi nhập; **không** verify DNS, allowlist, hay tham gia unlock. |
 
 ```mermaid
 flowchart TB
   subgraph UI["Màn login — luôn cùng thứ tự"]
     V["① Tên vault\nprofiles.json display_name"]
-    U["② Tên người dùng\nread-only — xem §3.1.1"]
-    P["③ Ô mật khẩu\nmaster password — input duy nhất khi 1 vault"]
-    V --> U --> P
+    E["② Email operator\nlabel sau lần đầu — §3.1.2"]
+    P["③ Ô mật khẩu\nmaster password"]
+    V --> E --> P
   end
 
-  subgraph Backend["Backend unlock"]
-    P --> Derive[Argon2id → SQLCipher]
-    Multi{≥ 2 vault?}
-    Multi -->|Có| Pick[profile_id từ bước ①]
-    Multi -->|Không| Single[profile mặc định]
-    Pick --> Derive
-    Single --> Derive
-    Derive --> App([App shell])
+  subgraph Backend["Rust — không phải auth account"]
+    Store["app_settings.json\noperator_email: text"]
+    FB["whoami fallback\nnếu chưa có"]
+    Regex["regex format only"]
+    Unlock["Argon2id → SQLCipher\nchỉ master pass"]
+    Regex --> Store
+    FB --> Store
+    Store --> E
+    P --> Unlock
   end
 ```
 
-#### 3.1.1 Nguồn hiển thị trên UI
+#### 3.1.1 Nguồn dữ liệu & lưu trữ
 
-| Field UI | 1 vault | ≥ 2 vault | Nguồn dữ liệu |
-|----------|---------|-----------|----------------|
-| Tên vault | Label read-only | Dropdown / select | `profiles.json` → `display_name` |
-| Tên người dùng | Label read-only | Label read-only | `app_settings.json` → `operator_display_name`; fallback tên OS user |
+| Field UI | 1 vault | ≥ 2 vault | Nguồn |
+|----------|---------|-----------|-------|
+| Tên vault | Label read-only | Dropdown | `profiles.json` → `display_name` |
+| Email operator | Label read-only | Label read-only | Backend → `app_settings.json` → `operator_email`; thiếu → `whoami` |
 | Mật khẩu | Input | Input | User nhập — **không lưu** |
 
+**Per-machine:** `operator_email` đi cùng `machine_role` trong `app_settings.json` — copy `.hvault` sang máy viewer **không** kéo email IT sang máy CEO; mỗi máy nhập/lưu riêng lần đầu.
+
+**IPC (0.3.0):** `get_app_settings` / `set_operator_email` (hoặc tương đương) — frontend chỉ hiển thị string từ Rust, không tự sửa file.
+
+#### 3.1.2 Lần đầu vs lần sau
+
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant UI as React
+  participant R as Rust / app_settings.json
+
+  alt Chưa có operator_email
+    UI->>U: Ô nhập email
+    U->>UI: user@example.com
+    UI->>R: set (regex OK)
+    R->>R: lưu plaintext
+    R-->>UI: OK → chuyển thành label
+    UI->>U: Label email + ô master pass
+  else Đã có operator_email
+    R-->>UI: operator_email
+    UI->>U: Label + ô master pass
+  else Thiếu + không nhập
+    R-->>UI: whoami fallback
+  end
 ```
-1 vault (UI):
+
+```
+Lần đầu (chưa có operator_email):
 ┌──────────────────────────────────┐
-│ Vault:      Công ty A            │  ← read-only
-│ Người dùng: Tuấn (IT)            │  ← read-only
-│ Mật khẩu:   [ •••••••••••••••• ] │  ← input duy nhất (backend)
+│ Email của bạn: [ user@co.com   ] │  ← input + regex format
+│         [ Tiếp tục ]             │
+└──────────────────────────────────┘
+        ↓
+┌──────────────────────────────────┐
+│ Vault:   … (tạo/chọn)            │
+│ Email:   user@co.com             │  ← label
+│ Mật khẩu: [ •••••••••••••••• ]   │
 │         [ Mở khóa ]              │
 └──────────────────────────────────┘
 
-≥ 2 vault (UI):
+Lần sau:
 ┌──────────────────────────────────┐
-│ Vault:      [ Công ty A      ▼ ] │
-│ Người dùng: Tuấn (IT)            │
+│ Vault:      Công ty A            │
+│ Email:      user@co.com          │  ← từ backend
 │ Mật khẩu:   [ •••••••••••••••• ] │
 │         [ Mở khóa ]              │
 └──────────────────────────────────┘
 ```
 
+**Regex V1:** validate **cấu trúc** email (có `@`, phần local/domain tối thiểu) — không phải xác thực danh tính. Implement ở **backend** khi `set`.
+
 | Chốt | Không làm trong V1 |
 |------|-------------------|
-| Backend: chỉ master password mở `.hvault` | Email login, user account + `password_hash` |
-| UI: luôn có tên vault + tên người dùng **trước** ô pass | Ẩn tên vault khi 1 profile |
-| ≥2 vault: dropdown **chỉ** ở dòng tên vault | PIN quick unlock |
-| | `workspace_members`, allowlist email |
-| | Remember email / `last_login_email` |
+| Unlock: chỉ master password | Email làm credential / sai email → fail login |
+| `operator_email` = text hiển thị + audit context | `workspace_members`, email allowlist gate |
+| Backend lưu & trả label | Frontend tự ghi `app_settings.json` |
+| UI email sẵn cho V2 shell | OTP, forgot-password, verify DNS |
+| ≥2 vault: dropdown **chỉ** dòng vault | PIN quick unlock |
 
 ### 3.2 Vai trò & chia sẻ file
 
@@ -437,7 +473,8 @@ timeline
 | `tauri dev` cần gì? | `npm run build` hoặc `npm run dev` (Vite :1420) |
 | Credential OAuth lưu đâu? | `oauth_credentials` — Phase 2, không `service_credentials` |
 | Viewer có sync được không? | Chỉ khi `sync_enabled: true` **và** admin policy cho phép — mặc định viewer copy file + `sync_enabled: false` |
-| Login UI 1 vault chỉ 1 ô pass? | **Backend** đúng; **UI** vẫn hiện tên vault + tên người dùng trước ô pass |
+| Login UI 1 vault chỉ 1 ô pass? | **Backend** đúng; **UI** vẫn vault + email label trước ô pass |
+| `operator_email` lưu đâu? | Backend → `app_settings.json` plaintext; fallback `whoami` |
 | Spec conflict với code? | **Sửa code**; sửa spec → tension HIGH |
 | Agent có tự activate milestone không? | **Không** — human activate |
 
@@ -463,3 +500,4 @@ timeline
 |------|----------|
 | 2026-06-18 | Khởi tạo — tổng hợp quyết định 0.1.0 + SIMPLE V1 + tensions active |
 | 2026-06-18 | §3.1 — sửa login UI: vault name + user name trước ô pass; backend 1 vault vẫn chỉ cần password |
+| 2026-06-18 | §3.1.2 — `operator_email`: backend lưu text, UI email + regex format, whoami fallback; không auth |

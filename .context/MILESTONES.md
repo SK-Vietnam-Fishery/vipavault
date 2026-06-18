@@ -77,9 +77,10 @@ Rules:
 
 Login:
 - Master password only — opens SQLCipher `.hvault` (backend knowledge factor).
-- UI login screen order: **vault name** → **user name** (read-only) → **password** — always, including 1 vault.
-- Backend: 1 vault → password only; ≥2 vaults → profile selection + password.
-- UI: 1 vault → vault name as label (not dropdown); ≥2 vaults → vault dropdown on row ①.
+- UI login order: **vault name** → **operator email** (label) → **password** — always after first setup.
+- First run: email input → backend regex format → save `operator_email` in `app_settings.json` → label → password field.
+- Backend stores display text: Rust read/write `operator_email` (plaintext, per-machine); fallback `whoami` — **not** auth.
+- Unlock: 1 vault → password only; ≥2 vaults → profile selection + password.
 - No email allowlist, no `workspace_members`, no user accounts.
 
 Roles & sharing:
@@ -247,7 +248,7 @@ Goal: Establish the admin/viewer experience boundary before write workflows exis
 
 Scope:
 - Main app layout.
-- SIMPLE V1 login screen: vault name → user name (read-only) → master password; vault dropdown on row ① if ≥2 profiles.
+- SIMPLE V1 login: vault → operator email label (from backend `app_settings.operator_email`) → master password; first-run email capture + regex; vault dropdown row ① if ≥2 profiles.
 - Profile switcher placeholder or initial implementation.
 - Per-machine `app_settings.json`: `machine_role`, `sync_enabled` only.
 - `machine_role = admin | viewer`.

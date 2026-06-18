@@ -13,6 +13,7 @@ Tauri command surface giữa React frontend và Rust backend.
 - Commands là boundary IPC — validate role (`admin`/`viewer`) trước write paths.
 - Error response không chứa secret values.
 - 0.1.0: chỉ `app_status` foundation command.
+- 0.3.0: `get_app_settings`, `set_operator_email` (plaintext + regex format; không secret).
 
 ## [manual] Invariants & Constraints
 
@@ -22,5 +23,6 @@ Tauri command surface giữa React frontend và Rust backend.
 ## [manual] Behavior chưa implement
 
 - Vault create/open/lock commands — 0.1.1.
+- App settings read/write (`operator_email`, `machine_role`) — 0.3.0.
 - Role guard helpers — 0.3.0.
 - Dashboard read-only queries — 0.4.0.

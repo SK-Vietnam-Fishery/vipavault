@@ -75,36 +75,41 @@ master_password
 
 ### Màn login V1 — UI vs backend (đã chốt / cập nhật 2026-06-18)
 
-**Backend** (yếu tố knowledge): chỉ **master password** (+ chọn profile nếu ≥2 vault).
+**Backend unlock** (yếu tố knowledge): chỉ **master password** (+ chọn profile nếu ≥2 vault).
 
-**UI** — thứ tự **luôn** giống nhau:
+**Operator email** — **không phải auth**; cùng lớp “lưu text hiển thị”:
+
+- **Lưu:** Rust đọc/ghi `app_settings.json` → `operator_email` (plaintext, per-machine).
+- **Lần đầu:** UI ô email → backend regex **format** đơn giản → lưu → thành label → hiện ô pass.
+- **Lần sau:** label email từ backend.
+- **Fallback:** `whoami` khi chưa có giá trị.
+- **Không:** allowlist, verify DNS, sai email → fail login, `workspace_members`.
+
+**UI login** — thứ tự **luôn** giống nhau (sau khi đã có email):
 
 1. **Tên vault** — `profiles.json` → `display_name`
-2. **Tên người dùng** — read-only; `app_settings.json` → `operator_display_name`, fallback OS username
-3. **Mật khẩu** — input master password
+2. **Email** — label từ `operator_email`
+3. **Mật khẩu** — master password
 
-| Số vault | Row ① Tên vault | Row ② Người dùng | Row ③ Backend input |
-|----------|-----------------|------------------|---------------------|
-| **1 vault** | Label read-only | Label read-only | Chỉ mật khẩu |
-| **≥ 2 vault** | Dropdown chọn vault | Label read-only | Vault đã chọn + mật khẩu |
+| Số vault | Row ① Vault | Row ② Email | Row ③ |
+|----------|-------------|-------------|-------|
+| **1 vault** | Label | Label (backend) | Chỉ mật khẩu |
+| **≥ 2 vault** | Dropdown | Label (backend) | Vault + mật khẩu |
 
 ```
-1 vault (UI — không chỉ một ô pass):
+Lần đầu — chưa có operator_email:
+  [ Email của bạn: _____________ ]  → regex → lưu backend → label
+
+Đã setup:
 ┌──────────────────────────────────┐
 │ Vault:      Công ty A            │
-│ Người dùng: Tuấn (IT)            │
-│ Mật khẩu:   [ •••••••••••••••• ] │
-│         [ Mở khóa ]              │
-└──────────────────────────────────┘
-
-≥ 2 vault:
-┌──────────────────────────────────┐
-│ Vault:      [ Công ty A      ▼ ] │
-│ Người dùng: Tuấn (IT)            │
+│ Email:      it@company.com       │
 │ Mật khẩu:   [ •••••••••••••••• ] │
 │         [ Mở khóa ]              │
 └──────────────────────────────────┘
 ```
+
+Chi tiết + diagram: `docs/technical-decisions.md` §3.1.2.
 
 **Milestone V1:** unlock **0.1.1** (vault core) + **0.3.0** (UI shell).
 
@@ -112,7 +117,7 @@ master_password
 
 | Lưu ở đâu | Keys / tables | Mã hóa? | Đi theo copy .hvault? |
 |-----------|---------------|---------|----------------------|
-| **`app_settings.json`** (per-machine) | `machine_role`, `sync_enabled` | Không | **Không** — mỗi máy riêng |
+| **`app_settings.json`** (per-machine) | `machine_role`, `sync_enabled`, `operator_email` | Không | **Không** — mỗi máy riêng |
 | **`profiles.json`** | `id`, `display_name`, `hvault_path` | Không | Tuỳ cách copy/setup |
 | **Trong `.hvault`** — `app_settings` table | `confuse_prefix`, `confuse_suffix`, … | SQLCipher | **Có** |
 

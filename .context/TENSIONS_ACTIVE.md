@@ -127,6 +127,21 @@ Phase:       V1
 
 ---
 
+## 2026-06-18 | auth_ui | operator_email
+Status:      RESOLVED_ACTIVE
+Tension:     Nhãn người thao tác trên login — free-text, OS user, hay email UI?
+Options:     operator_display_name free-text | OS whoami only | email ô nhập + lưu text backend
+Decision:    `operator_email` plaintext trong `app_settings.json`; backend Rust đọc/ghi; lần đầu UI email + regex format; fallback whoami; không tham gia unlock.
+Rationale:   Cùng lớp “lưu text hiển thị”; UI sẵn cho V2 shell; per-machine tránh lệch khi copy .hvault sang viewer.
+Constraint:  KHÔNG dùng operator_email làm credential V1; KHÔNG allowlist/DNS verify; reopen chỉ nếu đổi sang auth email thật (V2).
+Severity:    low
+Tags:        auth, ui, foundation, simple-v1
+Milestone:   V1
+Phase:       V1
+Ref:         docs/technical-decisions.md §3.1.2
+
+---
+
 ## 2026-06-18 | staleness | src-tauri_src_commands
 Status:      RESOLVED_ACTIVE
 Tension:     `[auto]` hash mismatch sau thêm `app_status` tests
