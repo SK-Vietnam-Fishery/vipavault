@@ -4,6 +4,9 @@ export function App() {
       <section className="boot-panel" aria-labelledby="app-title">
         <p className="eyebrow">0.1.0 Foundation</p>
         <h1 id="app-title">VipaVault</h1>
+        <p className="health" data-testid="app-version">
+          v0.1.0
+        </p>
         <p className="summary">
           Baseline Tauri, Rust, React, TypeScript, and tests are wired for the
           project foundation milestone.
