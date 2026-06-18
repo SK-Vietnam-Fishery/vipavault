@@ -1,4 +1,4 @@
-<!-- AUTO_START | hash: cffdc5b0 | built: 2026-06-17T16:47 -->
+<!-- AUTO_START | hash: d876eeca | built: 2026-06-18T11:26 -->
 # Context: `src-tauri/src`
 
 > **[auto-generated — không sửa tay phần này]**  
@@ -12,9 +12,9 @@
 pub fn app_info() -> AppStatus
 ```
 
-### `run` (line 22)
+### `build_app` (line 23) — Tauri builder for the desktop shell — safe to compile under `cargo test` (no `dist/`).
 ```rust
-pub fn run()
+pub fn build_app() -> tauri::Builder<tauri::Wry>
 ```
 
 ## [auto] Structs

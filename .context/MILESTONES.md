@@ -1,7 +1,7 @@
 # Milestones — VipaVault
 
 Current: V1
-Active Execution: 0.1.0 — Project Foundation
+Active Execution: (awaiting activation) 0.1.1 — Vault Core
 
 **Version ID convention:** bootstrap `0.1.0`–`0.1.1`; mọi milestone sau đó `0.N.0` tăng dần (`0.2.0` … `0.11.0`). Không dùng `0.1.4` kiểu patch lẫn minor.
 
@@ -100,7 +100,7 @@ Auth UX source of truth: questionnaire §Auth — update `docs/vipavault-spec.md
 
 | # | ID | Milestone | Method | Primary Outcome | Status |
 |---|---|---|---|---|---|
-| 1 | 0.1.0 | Project Foundation | Foundation slice | Tauri/Rust/React/test/context baseline works | current |
+| 1 | 0.1.0 | Project Foundation | Foundation slice | Tauri/Rust/React/test/context baseline works | done |
 | 2 | 0.1.1 | Vault Core | Security-led backend slice | Create/open/lock `.hvault` safely | planned |
 | 3 | 0.2.0 | Data Model & Migrations | Schema-led slice | V1 schema and migrations match spec | planned |
 | 4 | 0.3.0 | App Shell & Roles | UX workflow slice | Admin/viewer shell with enforced role gates | planned |
@@ -119,7 +119,8 @@ Auth UX source of truth: questionnaire §Auth — update `docs/vipavault-spec.md
 
 ## 0.1.0 — Project Foundation
 
-Status: current
+Status: done
+Completed: 2026-06-18
 Method: foundation slice
 Goal: Establish a runnable project baseline without implementing product behavior prematurely.
 

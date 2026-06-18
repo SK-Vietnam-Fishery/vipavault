@@ -7,7 +7,7 @@
 
 **Status:** ACTIVE  
 **Mode:** **AUTO** (foundation only — chuyển **MANUAL** khi activate 0.2.0+; xem `FOUNDATION_WORKFLOW.md` §1)  
-**Active execution:** `0.1.0 — Project Foundation`  
+**Active execution:** `(awaiting activation) 0.1.1 — Vault Core` — **0.1.0 done 2026-06-18**  
 **Cập nhật:** 2026-06-18  
 **SIMPLE V1:** Auth/sharing theo `.context/MILESTONES.md` §SIMPLE V1 — agent không implement FULL / Share Package trong V1.
 
@@ -175,9 +175,9 @@ context-gen build . --quiet    # khi chạm src/
 | `cargo test` | **PASS** — `build_app()` trong lib; `generate_context!` chỉ `main.rs`; `[[bin]] test = false` |
 | `npm test` | **PASS** — 2 tests (foundation shell + `app-version`) |
 | `npm run verify` | **PASS** — `npm test` + `test:rust` |
-| `npm build` / `dist/` | Cần cho `tauri dev` / release (S2) |
+| `npm build` / `dist/` | **PASS** — `build:check` script |
 | SIMPLE V1 trong milestones | Đã cập nhật |
-| OPEN tensions | 2× staleness `src-tauri_src*` (low) |
+| OPEN tensions | **0** — staleness resolved 2026-06-18 |
 
 ### 2.2 Lệnh chuẩn
 
@@ -358,12 +358,13 @@ Báo pass/fail từng lệnh.
 |------|-------|---------------|---------|--------|
 | 2026-06-18 | 0.1.0-S1 | agent | PASS — `npm install` | |
 | 2026-06-18 | 0.1.0-S3 | agent | PASS — TDD B: `build_app` + bin `test=false` | |
-| 2026-06-18 | 0.1.0-S6 | agent | PASS — Vitest `app-version` RED→GREEN | |
-| | 0.1.0-S2 | | pending — `npm run build` / `dist/` | |
-| | 0.1.0-S4 | | pending — README | |
-| | 0.1.0-S5 | | pending — context staleness | |
-| | 0.1.0-S7 | | | |
-| | 0.1.0-S8 | | | |
+| 2026-06-18 | 0.1.0-S6 | agent | PASS — Vitest `app-version` RED→GREEN | dfc6a07 |
+| 2026-06-18 | 0.1.0-S2 | agent | PASS — `npm run build` + `build:check` | |
+| 2026-06-18 | 0.1.0-S4 | agent | PASS — README + docs tracked | |
+| 2026-06-18 | 0.1.0-S5 | agent | PASS — context-gen + staleness resolved | |
+| 2026-06-18 | F-01 | agent | PASS — capabilities ACL + icons | |
+| | 0.1.0-S7 | | deferred — Q-0.1.0-005 | |
+| 2026-06-18 | 0.1.0-S8 | agent | PASS — exit checklist §3.1 | |
 
 ---
 

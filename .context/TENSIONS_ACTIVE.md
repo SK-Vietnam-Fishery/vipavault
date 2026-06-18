@@ -111,3 +111,31 @@ Tags:       oauth, schema, provider, storage
 Milestone:  V1
 Phase:      Phase 2
 
+---
+
+## 2026-06-18 | staleness | src-tauri_src
+Status:      RESOLVED_ACTIVE
+Tension:     `[auto]` thay đổi (`run()` → `build_app()`) nhưng `[manual]` chưa review
+Options:     Giữ placeholder generated | cập nhật `APP.md` + rebuild context-gen
+Decision:    Cập nhật `.context/modules/APP.md` (build_app, capabilities, TDD B); `context-gen build` refresh AST.
+Rationale:   Foundation 0.1.0 exit; manual source of truth là modules/, không sửa generated tay.
+Constraint:  KHÔNG reopen trừ khi lib.rs bootstrap pattern đổi lại.
+Severity:    low
+Tags:        staleness, src-tauri_src, foundation
+Milestone:   V1
+Phase:       V1
+
+---
+
+## 2026-06-18 | staleness | src-tauri_src_commands
+Status:      RESOLVED_ACTIVE
+Tension:     `[auto]` hash mismatch sau thêm `app_status` tests
+Options:     Bỏ qua | confirm `COMMANDS.md` + rebuild
+Decision:    `COMMANDS.md` đã mô tả `app_status` foundation; rebuild clears staleness.
+Rationale:   Low severity; module manual đã đầy đủ trước khi resolve.
+Constraint:  KHÔNG reopen trừ khi IPC surface thay đổi mà không cập nhật COMMANDS.md.
+Severity:    low
+Tags:        staleness, src-tauri_src_commands, foundation
+Milestone:   V1
+Phase:       V1
+
