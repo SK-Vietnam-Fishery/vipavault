@@ -17,6 +17,8 @@ Desktop app for managing hosting, email, and domain credentials — built for op
 
 OAuth providers (M365, Google Workspace) and Share Package export are **Phase 2+**.
 
+Project summary: [`docs/README.md`](docs/README.md).  
+Docs index: [`docs/INDEX.md`](docs/INDEX.md).  
 Full product spec: [`docs/vipavault-spec.md`](docs/vipavault-spec.md).  
 Technical decisions (dev): [`docs/technical-decisions.md`](docs/technical-decisions.md).
 
@@ -62,6 +64,8 @@ App data and `.hvault` files live outside the repo (e.g. `~/.vipavault/`), not i
 
 ```
 vipavault/
+  docs/README.md             # Project summary
+  docs/INDEX.md              # Docs catalog + layout rule
   docs/vipavault-spec.md     # Product spec (source of truth)
   src/                       # React + TypeScript (Vite)
   src-tauri/                 # Rust backend + Tauri shell

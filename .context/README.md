@@ -101,3 +101,5 @@ Chỉ đọc khi đổi execution milestone hoặc human yêu cầu planning r�
 ```
 
 Không load mặc định. Sau khi human approve → cập nhật `decisions/`, `TENSIONS_ACTIVE.md`, hoặc `planning/`.
+
+- `PROPOSAL_CUSTOM_FIELDS.md` — trường tự quy định trên credential (1 cột JSON + JSON1 search) — **DRAFT**

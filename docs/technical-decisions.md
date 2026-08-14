@@ -390,7 +390,7 @@ Stub có chủ đích — product logic theo milestone, không implement sớm t
 | Node | 24.x via nvm |
 | Vite dev port | **1420** (`tauri.conf.json` `devUrl`) |
 | App data | `~/.vipavault/` — ngoài git |
-| `docs/` | Tracked trong git (spec, tài liệu này) |
+| `docs/` | Tracked trong git — tóm tắt [`README.md`](README.md), mục lục [`INDEX.md`](INDEX.md) |
 | `dist/` | Gitignored — sinh bởi `npm run build` |
 
 Lệnh chuẩn trên máy dev: `.local/ENVIRONMENT.md` (gitignored, per-machine).

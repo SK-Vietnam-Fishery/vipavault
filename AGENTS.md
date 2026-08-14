@@ -390,8 +390,10 @@ Cargo test PHẢI pass trước khi commit. Frontend test chạy qua `npm test`.
 
 ```
 vipavault/
-  docs/
-    vipavault-spec.md         ← Spec chính
+  docs/                       ← tóm tắt: docs/README.md · mục lục: docs/INDEX.md
+    vipavault-spec.md         ← Spec chính (path ổn định)
+    technical-decisions.md
+    design/ reviews/ guides/ curriculum/
   src-tauri/
     src/
       vault/                  ← SQLCipher engine, key lifecycle

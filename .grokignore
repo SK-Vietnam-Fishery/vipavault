@@ -1,0 +1,57 @@
+# Grok index / @-picker — gitignore syntax.
+# Do not hide source, docs, or .context/ (agents load those).
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+.pnpm-store/
+.turbo/
+
+# Frontend build
+dist/
+dist-ssr/
+build/
+out/
+.vite/
+coverage/
+.nyc_output/
+
+# Rust / Tauri build
+**/target/
+src-tauri/gen/
+src-tauri/WixTools/
+**/*.rs.bk
+**/*.pdb
+
+# Packaged installers
+*.app.tar.gz
+*.AppImage
+*.AppImage.tar.gz
+*.dmg
+*.deb
+*.rpm
+*.msi
+*.msi.zip
+*.nsis.zip
+*.exe
+
+# Machine-local & secrets
+.local/
+.env
+.env.*
+!.env.example
+*.hvault
+**/*.hvault
+
+# Logs / OS / IDE
+logs/
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

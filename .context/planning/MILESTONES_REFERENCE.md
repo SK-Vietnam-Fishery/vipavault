@@ -2,8 +2,9 @@
 
 > Full V1 roadmap reference.
 > Do not load by default. Pull details into `.context/MILESTONES.md` when a milestone approaches or human asks.
+> **Reordered 2026-07-13** theo `docs/pm-review-solutions.md` — dogfood tại 0.6.0; Confuse & Notification cắt khỏi V1 (chuyển Phase 2+ backlog); release tại 0.10.0.
 
-**Version ID convention:** bootstrap `0.1.0`–`0.1.1`; mọi milestone sau đó `0.N.0` tăng dần (`0.2.0` … `0.11.0`).
+**Version ID convention:** bootstrap `0.1.0`–`0.1.1`; mọi milestone sau đó `0.N.0` tăng dần (`0.2.0` … `0.10.0`).
 
 ---
 
@@ -17,24 +18,23 @@
 | 4 | 0.3.0 | App Shell & Roles | Admin/viewer shell with enforced role gates |
 | 5 | 0.4.0 | Dashboard Slice | Dashboard reads real local data and alert thresholds |
 | 6 | 0.5.0 | Credential Management | Admin credential viewer/editor with no secret leakage |
-| 7 | 0.6.0 | Email Accounts Local | Local email lifecycle with generated passwords and audit |
+| 7 | 0.6.0 | Email Accounts Local | Local email lifecycle with generated passwords and audit — **DOGFOOD milestone** |
 | 8 | 0.7.0 | Provider Routing V1 | cPanel/DirectAdmin routing and unknown-provider skip |
 | 9 | 0.8.0 | Manual Sync & Rate Limit | Refresh sync with hard rate limit |
 | 10 | 0.9.0 | Provider Email Apply | Pending email changes apply to provider APIs |
-| 11 | 0.10.0 | Confuse & Notification | Confuse message generated only at send time |
-| 12 | 0.11.0 | MVP Hardening & Release | Packaged desktop MVP with tests passing |
+| 11 | 0.10.0 | MVP Hardening & Release | Packaged desktop MVP with tests passing |
 
 ---
 
 ## V1 vs FULL (Phase 1.5+)
 
-| Capability | V1 (0.1.0–0.11.0) SIMPLE | FULL (post-0.11.0) |
+| Capability | V1 (0.1.0–0.10.0) SIMPLE | FULL (post-0.10.0) |
 |------------|--------------------------|---------------------|
 | Login | Master password only | Optional email gate (TBD) |
 | Share | Full `.hvault` copy + `machine_role: viewer` | Share Package subset + activation claim |
 | Schema | No `workspace_members` | `workspace_members` if email gate approved |
 | Audit actor | `actor_note` | Optional `actor_email` |
-| PIN quick unlock | Defer | 0.11.0+ if implemented |
+| PIN quick unlock | Defer | 0.10.0+ if implemented |
 
 Reference: `.context/planning/MILESTONE_QUESTIONNAIRE.md` §Auth, §FULL, TD-SHARE-*.
 
@@ -152,6 +152,8 @@ Exit Criteria:
 
 Goal: Model email account workflows locally before provider apply.
 
+> **DOGFOOD:** Từ milestone này app dùng được hàng ngày với dữ liệu nhập tay. 0.7.0–0.9.0 chỉ triển khai nếu sau ≥1 tháng dogfood vẫn thấy đau ở thao tác cPanel thủ công.
+
 Deliverables:
 - Email account list per service.
 - Create local email with CSPRNG password.
@@ -208,22 +210,7 @@ Exit Criteria:
 
 ---
 
-## 0.10.0 — Confuse & Notification
-
-Goal: Generate notification-safe password messages.
-
-Deliverables:
-- Confuse rule from `app_settings`.
-- Generate confuse string at send time only.
-- `confuse_used` audit field.
-- Notification composer.
-
-Exit Criteria:
-- Vault stores real password only; confuse string is not source of truth.
-
----
-
-## 0.11.0 — MVP Hardening & Release
+## 0.10.0 — MVP Hardening & Release
 
 Goal: Prepare MVP for real desktop use (SIMPLE V1 complete).
 
@@ -243,10 +230,29 @@ Exit Criteria:
 
 ## Phase 1.5+ — FULL extension (not V1 execution)
 
-Deferred until human activates execution past 0.11.0:
+Deferred until human activates execution past 0.10.0:
 
 - **Share Package** — subset export, activation-code claim, recipient `PRAGMA rekey` (TD-SHARE-*).
 - **Workspace / email gate** — only if reopened (`workspace_members`, Share Workspace).
 - **PIN quick unlock** — admin machine only, if approved.
 
 Detail: `.context/planning/MILESTONE_QUESTIONNAIRE.md` §FULL. No milestone ID assigned until roadmap review.
+
+---
+
+## Phase 2+ Backlog
+
+### Confuse & Notification (cắt khỏi V1 — 2026-07-13)
+
+Goal: Generate notification-safe password messages.
+
+Deliverables:
+- Confuse rule from `app_settings`.
+- Generate confuse string at send time only.
+- `confuse_used` audit field.
+- Notification composer.
+
+Exit Criteria:
+- Vault stores real password only; confuse string is not source of truth.
+
+**Điều kiện mở lại:** threat model phải được làm rõ trước khi implement — rule prefix/suffix tĩnh dùng chung toàn công ty không còn là bí mật sau người nhận thứ 2; V1 dựa vào `must_change_password` làm lớp bảo vệ thật. Phương án thay thế cân nhắc: one-time secret link self-host. Chi tiết: `docs/pm-review-solutions.md` §7.
